@@ -15,6 +15,9 @@
 #define HOSTNAME "ESP8266-OTA-" ///< Hostename. The setup function adds the Chip ID at the end.
 /// @}
 
+#define max_variable 150  // Max variable length 
+
+
 // ******************************************************************************************************
 // **       Config management        **
 // ************************************
@@ -27,8 +30,11 @@ class Conf {
     void setConfig(String vars);
     void addConfig(String varname, String varval);
     static String getFirstVar(String *text, String separator);
+    String getVariable(String varname);
+    void getVariable(char* value,String varname);
   private:
     String variables;
+    const String equal="=>";
 };
 Conf::Conf() {
   variables = "";
@@ -69,6 +75,19 @@ String Conf::getFirstVar(String *text, String separator) {
   first.trim();
   return first;
 }
+String Conf::getVariable(String varname) {
+  int8_t pos = variables.indexOf(varname+equal);
+  if (pos == -1) return ("");
+  String first = variables.substring(pos + varname.length() + equal.length());
+  pos = first.indexOf("\n");
+  first = first.substring(0, pos);
+  first.trim();
+  return first;
+}
+void Conf::getVariable(char* value,String varname) {
+  String val = getVariable(varname);
+  val.toCharArray(value, max_variable+1);
+}
 
 // ******************************************************************************************************
 // **       WIFI management        **
@@ -79,8 +98,8 @@ String Conf::getFirstVar(String *text, String separator) {
 class TeWifi {
   public:
     int modeAP;
-    char* ssid;
-    char* pass;
+    String ssid;
+    String pass;
     bool dhcp;
     String apIP;
     String apGTW;
@@ -90,19 +109,25 @@ class TeWifi {
     MDNSResponder mdns;
     static IPAddress parseIP(String ip);
     TeWifi();
-    TeWifi(Conf conf);
+    TeWifi(Conf *conf);
     bool modeWifiAP();
     bool modeWifiClient();
+  private:
+    Conf *_conf;  
 };
 TeWifi::TeWifi(void) {
   dhcp = true;
   ssid = "KITIPASA";
   pass = "petard@s2016";
 }
-TeWifi::TeWifi(Conf conf) {
-  dhcp = true;
-  ssid = "KITIPASA";
-  pass = "petard@s2016";
+TeWifi::TeWifi(Conf *conf) {
+  _conf = conf;
+  dhcp = (conf->getVariable("dhcp")=="false"?false:true);
+  ssid = conf->getVariable("KITIPASA");
+  ssid = (ssid==""?"KITIPASA":ssid);
+  pass = conf->getVariable("petard@s2016");
+  pass = (pass==""?"petard@s2016":pass);
+  _conf = conf;
 }
 IPAddress TeWifi::parseIP(String ip) {
   int a1 = Conf::getFirstVar(&ip, ",").toInt();
@@ -115,7 +140,11 @@ bool TeWifi::modeWifiAP() {
   WiFi.mode(WIFI_AP_STA);
   WiFi.softAPConfig( TeWifi::parseIP(apIP), TeWifi::parseIP(apGTW), TeWifi::parseIP(apMSK) );
   WiFi.softAP("TardisTime");
-  if (!WiFi.softAP(ssid, pass, apChannel, !apVisible )) {
+  char c_ssid[150];
+  char c_pass[150];
+  ssid.toCharArray(c_ssid, 150);
+  pass.toCharArray(c_pass, 150);
+  if (!WiFi.softAP(c_ssid, c_pass, apChannel, !apVisible )) {
     return false;
   }
   return true;
@@ -125,12 +154,14 @@ bool TeWifi::modeWifiClient() {
     WiFi.mode(WIFI_AP_STA);
     WiFi.softAPConfig( TeWifi::parseIP(apIP), TeWifi::parseIP(apGTW), TeWifi::parseIP(apMSK) );
     WiFi.softAP("TardisTime");
-
     //    WiFi.hostname(hostname);
-    //  WiFi.begin(ssid, password);
-  } else {
-    WiFi.begin(ssid, pass);
-  }
+  } 
+  char c_ssid[150];
+  char c_pass[150];
+  ssid.toCharArray(c_ssid, 150);
+  pass.toCharArray(c_pass, 150);
+  WiFi.begin(c_ssid, c_pass);
+  if (dhcp)
   while (WiFi.status() != WL_CONNECTED) {
     delay(500);
   }
@@ -212,7 +243,7 @@ TeWifi *tewifi;
 
 void setup(void) {
   configuration = new Conf();
-  tewifi = new TeWifi(*configuration);
+  tewifi = new TeWifi(configuration);
 
   jsonPage = "{ 'status':'success', 'count': 1, 'type':'Sonoff TelePi', 'time':'', 'hostname':'OpenWrt2', 'results':";
   // Set Hostname.
