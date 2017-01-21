@@ -1,0 +1,34 @@
+R"=====(
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN"  "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<link href="milligram.min.css" type="text/css" rel="stylesheet"/>
+<script type="text/javascript">
+ function booting() {
+    //document.getElementById("workmode").onclick = function () {  location.href = "workmode.html";  };
+    document.getElementById("wifisetup").onclick = function () {  location.href = "wifisetup.html";  };
+    document.getElementById("update").onclick = function () {  location.href = "update";  };
+  }
+</script>
+</head>
+<body onload="booting()">
+ <div class="container">
+
+  <div class="row">
+    <div class="column"><p id="contact_label">Telepi ESP8266 MENU</p></div>
+  </div>
+  <div class="row">
+    <div class="column"><a id="workmode" class="button" href="workmode.html">Work Mode</a></div>
+  </div>
+  <div class="row">
+    <div class="column"><a id="wifisetup" class="button" href="wifisetup.html">Wifi Setup</a></div>
+  </div>
+  <div class="row">
+    <div class="column"><a id="update" class="button" href="update">Firmware Update</a></div>
+  </div>
+
+ </div>
+</body>
+</html>
+)====="
