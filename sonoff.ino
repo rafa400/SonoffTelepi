@@ -1,5 +1,6 @@
 #include <ESP8266WiFi.h>
 // #include <WiFiClient.h>
+#include <DNSServer.h>
 #include <ESP8266WebServer.h>
 #include <ESP8266HTTPUpdateServer.h>
 #include <ESP8266mDNS.h>
@@ -16,7 +17,7 @@
 /// @}
 
 #define max_variable 150  // Max variable length 
-
+const byte DNS_PORT = 53;
 
 // ******************************************************************************************************
 // **       Config management        **
@@ -31,7 +32,7 @@ class Conf {
     void addConfig(String varname, String varval);
     static String getFirstVar(String *text, String separator);
     String getVariable(String varname);
-    void getVariable(char* value,String varname);
+    char* getVariableChar(String varname);
   private:
     String variables;
     const String equal="=>";
@@ -84,9 +85,8 @@ String Conf::getVariable(String varname) {
   first.trim();
   return first;
 }
-void Conf::getVariable(char* value,String varname) {
-  String val = getVariable(varname);
-  val.toCharArray(value, max_variable+1);
+char* Conf::getVariableChar(String varname) {
+  return (char *)varname.c_str();
 }
 
 // ******************************************************************************************************
@@ -97,6 +97,7 @@ void Conf::getVariable(char* value,String varname) {
 
 class TeWifi {
   public:
+    String hostname;
     int modeAP;
     String ssid;
     String pass;
@@ -107,10 +108,12 @@ class TeWifi {
     int apChannel;
     bool apVisible;
     MDNSResponder mdns;
+    DNSServer dnsServer;
     static IPAddress parseIP(String ip);
     TeWifi();
     TeWifi(Conf *conf);
     bool modeWifiAP();
+    bool modeDefaultWifiAP();
     bool modeWifiClient();
   private:
     Conf *_conf;  
@@ -118,16 +121,29 @@ class TeWifi {
 TeWifi::TeWifi(void) {
   dhcp = true;
   ssid = "KITIPASA";
-  pass = "petard@s2016";
+  pass = "<kitipasa>";
+  // Set Hostname.
+  hostname = HOSTNAME + String(ESP.getChipId(), HEX);
+  WiFi.hostname(hostname);
 }
 TeWifi::TeWifi(Conf *conf) {
+  TeWifi();
   _conf = conf;
+
+  hostname = HOSTNAME + String(ESP.getChipId(), HEX);
+  WiFi.hostname(hostname);
+  
   dhcp = (conf->getVariable("dhcp")=="false"?false:true);
-  ssid = conf->getVariable("KITIPASA");
+  ssid = conf->getVariable("ssid");
   ssid = (ssid==""?"KITIPASA":ssid);
-  pass = conf->getVariable("petard@s2016");
-  pass = (pass==""?"petard@s2016":pass);
-  _conf = conf;
+  pass = conf->getVariable("pass");
+  pass = (pass==""?"<kitipasa>":pass);
+
+  apIP = '192.168.0.1';
+  apGTW = '192.168.0.1';
+  apMSK = '255.255.255.0';
+  apChannel = 7;
+  apVisible = true;
 }
 IPAddress TeWifi::parseIP(String ip) {
   int a1 = Conf::getFirstVar(&ip, ",").toInt();
@@ -140,13 +156,19 @@ bool TeWifi::modeWifiAP() {
   WiFi.mode(WIFI_AP_STA);
   WiFi.softAPConfig( TeWifi::parseIP(apIP), TeWifi::parseIP(apGTW), TeWifi::parseIP(apMSK) );
   WiFi.softAP("TardisTime");
-  char c_ssid[150];
-  char c_pass[150];
-  ssid.toCharArray(c_ssid, 150);
-  pass.toCharArray(c_pass, 150);
-  if (!WiFi.softAP(c_ssid, c_pass, apChannel, !apVisible )) {
+  if (!WiFi.softAP(ssid.c_str(), pass.c_str(), apChannel, !apVisible )) {
     return false;
   }
+  return true;
+}
+bool TeWifi::modeDefaultWifiAP() {
+  WiFi.mode(WIFI_AP_STA);
+  WiFi.softAPConfig( TeWifi::parseIP("192.168.0.1"), TeWifi::parseIP("192.168.0.1"), TeWifi::parseIP("255.255.255.0") );
+  WiFi.softAP("-TelePi-Sonoff-", "kitipasa" );
+  if (!WiFi.softAP("-TelePi-Sonoff-", "kitipasa" )) {
+    return false;
+  }
+  dnsServer.start(DNS_PORT, "*", TeWifi::parseIP("192.168.0.1"));
   return true;
 }
 bool TeWifi::modeWifiClient() {
@@ -156,13 +178,8 @@ bool TeWifi::modeWifiClient() {
     WiFi.softAP("TardisTime");
     //    WiFi.hostname(hostname);
   } 
-  char c_ssid[150];
-  char c_pass[150];
-  ssid.toCharArray(c_ssid, 150);
-  pass.toCharArray(c_pass, 150);
-  WiFi.begin(c_ssid, c_pass);
-  if (dhcp)
-  while (WiFi.status() != WL_CONNECTED) {
+  WiFi.begin(ssid.c_str(), pass.c_str());
+  if (dhcp) while (WiFi.status() != WL_CONNECTED) {
     delay(500);
   }
   mdns.begin("esp8266", WiFi.localIP());
@@ -172,9 +189,6 @@ bool TeWifi::modeWifiClient() {
 // ******************************************************************************************************
 // **       Web Server        **
 // **********************************
-
-
-MDNSResponder mdns;
 
 const char *milligramchar =
 #include "/root/Arduino/sonoff/milligram.min.css"
@@ -188,10 +202,12 @@ const char *workmodehtmlchar =
 const char *wifisetuphtmlchar =
 #include "/root/Arduino/sonoff/wifisetup.html"
   ;
+const char *gradientsvgchar =
+#include "/root/Arduino/sonoff/gradient.svg"
+  ;
 
-ESP8266WebServer httpServer(80);
-ESP8266HTTPUpdateServer httpUpdater;
 
+  
 String jsonPage = "";
 // String milligram ="";
 
@@ -238,6 +254,9 @@ int filter(int input, int state, int dsec) {
   return true;
 }
 
+ESP8266WebServer httpServer(80);
+ESP8266HTTPUpdateServer httpUpdater;
+
 Conf *configuration;
 TeWifi *tewifi;
 
@@ -246,16 +265,15 @@ void setup(void) {
   tewifi = new TeWifi(configuration);
 
   jsonPage = "{ 'status':'success', 'count': 1, 'type':'Sonoff TelePi', 'time':'', 'hostname':'OpenWrt2', 'results':";
-  // Set Hostname.
-  String hostname(HOSTNAME);
-  hostname += String(ESP.getChipId(), HEX);
-  WiFi.hostname(hostname);
 
   pinMode(GPIO13Led, OUTPUT);
   digitalWrite(GPIO13Led, LOW);
   blink(GPIO13Led, 600, 3);
   if (filter(GPIO00Button, LOW, 700)) { //Check if button is HIGH for ~700ms
     blink(GPIO13Led, 500, 8);
+    tewifi->modeWifiAP();
+  } else {
+    tewifi->modeWifiClient();    
   }
 
   pinMode(GPIO12Relay, OUTPUT);
@@ -263,14 +281,8 @@ void setup(void) {
 
   pinMode(GPIO00Button, INPUT);
 
-
-  tewifi->modeWifiClient();
-  
   httpServer.on("/", []() {
-    String hostname(HOSTNAME);
-    hostname += String(ESP.getChipId(), HEX);
-    WiFi.hostname(hostname);
-    httpServer.send(200, "text/html", jsonPage + " [ { 'Relay1':'" + hostname + "' } ]}"  );
+    httpServer.send(200, "text/html", jsonPage + " [ { 'Relay1':'" + tewifi->hostname + "' } ]}"  );
   });
   httpServer.on("/on", []() {
     httpServer.send(200, "text/html", jsonPage + " [ { 'Relay1':'On' } ]}"  );
@@ -304,18 +316,15 @@ void setup(void) {
         }
       }
     }
-    char charBuf[150];
-    content.toCharArray(charBuf, 150);
 
     String wifisetuphtml(wifisetuphtmlchar);
-    char buffer[wifisetuphtml.length() + 100];
-    String final;
+    char buffer[wifisetuphtml.length() + 1000];
 
     int sec = millis() / 1000;
     int min = sec / 60;
     int hr = min / 60;
 
-    sprintf(buffer, wifisetuphtmlchar, "checked", "", "100.100.100.5", "255.255.255.0", "100.100.100.1", "8.8.8.8", charBuf, hr, min % 60, sec % 60);
+    sprintf(buffer, wifisetuphtmlchar, "selected=\"selected\"", "", "100.100.100.5", "100.100.100.1", "255.255.255.0", "8.8.8.8", content.c_str(), hr, min % 60, sec % 60);
     httpServer.send(200, "text/html", buffer );
     delay(100);
   });
@@ -325,6 +334,12 @@ void setup(void) {
     httpServer.send(200, "text/css", milligram );
     delay(100);
   });
+  httpServer.on("/gradient.svg", []() {
+    String gradient(gradientsvgchar);
+    httpServer.send(200, "image/svg+xml", gradient );
+    delay(100);
+  });
+  
   httpServer.on("/config.txt", []() {
     File configFile = SPIFFS.open("/config.txt", "r");
     String content = "EMPTY!";
@@ -347,14 +362,15 @@ void setup(void) {
 
   httpUpdater.setup(&httpServer);
   httpServer.begin();
-  mdns.addService("http", "tcp", 80);
+  tewifi->mdns.addService("http", "tcp", 80);
   // Start OTA server.
-  ArduinoOTA.setHostname((const char *)hostname.c_str());
+  ArduinoOTA.setHostname((const char *)tewifi->hostname.c_str());
   ArduinoOTA.begin();
   blink(GPIO13Led, 600, 3);
 }
 
 void loop(void) {
+  tewifi->dnsServer.processNextRequest();
   httpServer.handleClient();
   buttonStateOld = buttonState;
   buttonState = digitalRead(GPIO00Button);

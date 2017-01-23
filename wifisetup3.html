@@ -1,0 +1,31 @@
+R"=====(<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN"  "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+ <meta charset="UTF-8">
+ <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<link href="milligram.min.css" type="text/css" rel="stylesheet"/>
+</head>
+<body>
+<div id="wrapper">
+
+<!-- http://cssround.com/ Estilos para los marcos y cuadros -->
+<div style="width:400px;height:300px;-webkit-border-radius: 20px;-moz-border-radius: 20px;border-radius: 20px;background-color:#E3A20B;-webkit-box-shadow: #B3B3B3 26px 26px 26px;-moz-box-shadow: #B3B3B3 26px 26px 26px; box-shadow: #B3B3B3 26px 26px 26px;">
+ <p id="contact_label">Telepi ESP8266 MENU</p>
+ <p id="contact_label">* NETWORK SETUP *</p>
+ <form method="post" action="wifisetup.html">
+  <p><input type="radio" name="dhcp" value="dhcp" %s> DHCP Client
+     <input type="radio" name="dhcp" value="fixed" %s> Fixed IP</p>
+  <p><input type="text" name="myip" placeholder="192.168.0.5" value="%s"></p>
+  <p><input type="text" name="mask" placeholder="255.255.255.0" value="%s"></p>
+  <p><input type="text" name="gatw" placeholder="192.168.0.5" value="%s"></p>
+  <p><input type="text" name="dns1" placeholder="8.8.8.8" value="%s"></p>
+  <p><input type="submit" value="SUBMIT"><input type="submit" value="AIXO"></p>
+  <p id="ESO">%s</p>
+  <p>Uptime: %02d:%02d:%02d</p>
+ </form>
+</div>
+</div>
+</body>
+</html>
+
+)====="
