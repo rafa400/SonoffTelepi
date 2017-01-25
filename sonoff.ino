@@ -191,7 +191,7 @@ bool TeWifi::modeWifiClient() {
 // **********************************
 
 const char *milligramchar =
-#include "/root/Arduino/sonoff/milligram.min.css"
+#include "/root/Arduino/sonoff/VictorLozada.css"
   ;
 const char *indexhtmlchar =
 #include "/root/Arduino/sonoff/index.html"
@@ -329,7 +329,7 @@ void setup(void) {
     delay(100);
   });
 
-  httpServer.on("/milligram.min.css", []() {
+  httpServer.on("/VictorLozada.css", []() {
     String milligram(milligramchar);
     httpServer.send(200, "text/css", milligram );
     delay(100);

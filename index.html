@@ -2,168 +2,30 @@ R"=====(<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN"  "http://www.w3.org/TR
 <html>
 <head>
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-   <!-- <link href="milligram.min.css" type="text/css" rel="stylesheet"/> -->
+   <link href="VictorLozada.css" type="text/css" rel="stylesheet"/>
 <script type="text/javascript">
  function booting() {
     //document.getElementById("workmode").onclick = function () {  location.href = "workmode.html";  };
     document.getElementById("wifisetup").onclick = function () {  location.href = "wifisetup.html";  };
     document.getElementById("update").onclick = function () {  location.href = "update";  };
+    document.getElementById("workmode").onclick = function () {  location.href = "workmode";  };
+
   }
 </script>
-<style>
-body{
-  background:url(gradient.svg);
-  background-size: cover;
-  font-family: 'Open Sans', sans-serif;
-  margin:50px auto;
-}
-.cform{
-  margin:auto;
-  width:250px;
-  border:5px solid rgba(255,255,255,0.2);
-  border-radius:5px;
-}
-.cform .title{
-  width:100%;
-  height:35px;
-  background:#65A832;
-  text-align:center;
-  background:-webkit-linear-gradient(top, #65A832 0%, #5E9C2F 85%, #5A972C 100%);
-  background:-moz-linear-gradient(top, #65A832 0%, #5E9C2F 85%, #5A972C 100%);
-  background:-o-linear-gradient(top, #65A832 0%, #5E9C2F 85%, #5A972C 100%);
-  color:#FFF;
-  font-size:20px;
-  border-radius:3px 3px 0 0;
-  padding-top:10px;
-}
-.cform .title:after{
-  content:'';
-  border-top: 6px solid #5A972C;
-	border-left: 6px solid transparent;
-	border-right: 6px solid transparent;
-  display:block;
-  position:absolute;
-  margin:35px 15px;
-}
-.cform .title  span{
-  position:absolute;
-  display:block;
-  margin-left:75px;
-}
-.cform .form{
-  background:#FFF;
-  width:100%;
-  font-family:;
-  margin:auto;
-  text-align:center;
-  padding:10px 0;
-}
-.cform .form div{
-  text-align:justify;
-  margin-left:34px;
-  padding:5px 0;
-}
-.cform .form input[type="text"],textarea{
-  padding:5px;
-  outline:none;
-  width:170px;
-  height:20px;
-  border:1px solid #DEDEDE;
-  border-radius:5px;
-  color:#65A832;
-  font-family: 'Open Sans', sans-serif;
-  font-size:11px;
-  transition:linear 0.4s;
-}
-.cform .form select{
-  padding:5px;
-  outline:none;
-  width:180px;
-  height:30px;
-  border:1px solid #DEDEDE;
-  border-radius:5px;
-  color:#65A832;
-  font-family: 'Open Sans', sans-serif;
-  font-size:11px;
-  transition:linear 0.4s;
-}
-.cform .form select:focus{
-  height:30px;
-}
-.cform .form textarea:focus{
-  height:70px;
-}
-.cform .btn{
-  background:#F3F3F3;
-  text-align:center;
-  border-radius:0 0 3px 3px;
-  border-top:1px solid #EEE;
-  padding:5px;
-}
-.cform .btn input[type="submit"]{
-  background:#65A832;
-  background:linear-gradient(top, #65A832 0%, #5E9C2F 85%, #5A972C 100%);
-  padding:10px;
-  border:none;
-  border-radius:5px;
-  box-shadow:0px 1px 1px #54892C;
-  color:#FFF;
-  cursor:pointer;
-  font-family: 'Open Sans', sans-serif;
-}
-
-</style>
 </head>
 <body onload="booting()">
- <div class="container">
-
-  <div class="row">
-    <div class="column"><p id="contact_label">Telepi ESP8266 MENU</p></div>
-  </div>
-  <div class="row">
-    <div class="column"><a id="workmode" class="button" href="workmode.html">Work Mode</a></div>
-  </div>
-  <div class="row">
-    <div class="column"><a id="wifisetup" class="button" href="wifisetup.html">Wifi Setup</a></div>
-  </div>
-  <div class="row">
-    <div class="column"><a id="update" class="button" href="update">Firmware Update</a></div>
-  </div>
-
- </div>
-
  <section class="cform">
    <article class="title">
-     <span>Wifi Config</span>
-   </article>
-   <article class="form">
-     <div>Host Name</div>
-     <input type="text" name="hostname" placeholder="hostame">
-     <div>Wifi Mode</div>
-     <select id="wifimode">
-       <option value="AP" selected="selected">Access Point</option>
-       <option value="CLI">Client</option>
-     </select>
-     <div></div>
-     <article class="title">
-       <span>LAN Config</span>
-     </article>
-     <div></div>
-     <select id="dhcp">
-       <option value="dhcp" selected="selected">DHCP Client</option>
-       <option value="fixip">Fixed IP</option>
-     </select>
-     <div>IP</div>
-     <input type="text"  name="myip" placeholder="192.168.0.5" value="" required pattern="^([0-9]{1,3}\.){3}[0-9]{1,3}$">
-     <div>Gateway</div>
-     <input type="text"  name="myip" placeholder="192.168.0.1" value="" required pattern="^([0-9]{1,3}\.){3}[0-9]{1,3}$">
-     <div>Netmask</div>
-     <input type="text"  name="myip" placeholder="255.255.255.0" value="" required pattern="^([0-9]{1,3}\.){3}[0-9]{1,3}$">
-       <div>Your Message</div>
-     <textarea placeholder="I'm looking for ..."></textarea>
+     <span>Telepi ESP8266 MENU</span>
    </article>
    <article class="btn">
-     <input type="submit" value="Send The Message">
+     <input id="workmode" type="submit" value="Work Mode">
+   </article>
+   <article class="btn">
+     <input id="wifisetup" type="submit" value="wifisetup.html">
+   </article>
+   <article class="btn">
+     <input id="update" type="submit" value="Firmware Update">
    </article>
  </section>
 
