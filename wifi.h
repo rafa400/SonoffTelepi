@@ -34,6 +34,7 @@ class TeWifi {
     bool modeWifiAP();
     bool modeDefaultWifiAP();
     bool modeWifiClient();
+    bool checkWifi();
   private:
     Conf *co;
 };

@@ -109,6 +109,7 @@ int seconds = millis() / 1000;
 char message_buff[100];
 
 void loop(void) {
+  tewifi->checkWifi();
   tewifi->dnsServer.processNextRequest();
   WebS->httpServer->handleClient();
   buttonStateOld = buttonState;

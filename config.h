@@ -6,6 +6,15 @@
 // ******************************************************************************************************
 // **       Config management        **
 // ************************************
+
+#define pair_max 20  // Max number of variables
+
+struct pair {
+   String variable;
+   String value;
+};
+
+
 class Conf {
   public:
     Conf();
@@ -19,8 +28,10 @@ class Conf {
     String getVariable(String varname, String defval);
     char* getVariableChar(String varname);
   private:
+    pair myvar[pair_max+1];
     String variables;
-    const String equal = "=>";
+    const String equ = "=>";
+    int maxv;
 };
 
 #endif //TELEPICONFIG_H

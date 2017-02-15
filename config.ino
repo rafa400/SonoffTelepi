@@ -1,35 +1,31 @@
-#include <ESP8266WiFi.h>
-// #include <WiFiClient.h>
-#include <DNSServer.h>
-#include <ESP8266WebServer.h>
-#include <ESP8266HTTPUpdateServer.h>
-#include <ESP8266mDNS.h>
-
-// #include <WiFiUdp.h>
 #include <FS.h>
-#include <ArduinoOTA.h>
-#include <PubSubClient.h>
 
 #include "config.h"
 
 Conf::Conf() {
-  variables = "";
+  variables = " ";
   load();
+  maxv=0;
 }
 bool Conf::load() {
   File configFile = SPIFFS.open("/config.txt", "r");
+  maxv=0;
   if (!configFile) return false;
-  variables = configFile.readString();
+  while ((maxv<pair_max) && (configFile.available()>0)) {
+    myvar[maxv].variable=configFile.readBytesUntil(':');
+    myvar[maxv].value=configFile.readBytesUntil('\n');
+    maxv++;
+  }
   configFile.close();
-  variables.trim();
-  variables.replace("\r", "\n");
-  variables.replace("\n\n", "\n");
   return true;
 }
 bool Conf::save() {
   File configFile = SPIFFS.open("/config.txt", "w");
   if (!configFile) return false;
-  configFile.print(variables);
+  for(int i=0;i<maxv;i++) {
+    configFile.print(myvar[i].variable+":");
+    configFile.print(myvar[i].valor+"\n");
+  }
   configFile.close();
   return true;
 }
@@ -44,7 +40,7 @@ void Conf::addConfig(String varname, String varval) {
 }
 String Conf::getFirstVar(String *text, String separator) {
   int8_t pos = text->indexOf(separator);
-  if (pos == -1) return (*text);
+  if (pos == -1) {String first=*text; return ("");}
   String first = text->substring(0, pos);
   *text = text->substring(pos + 1);
   text->trim();
@@ -58,14 +54,16 @@ String Conf::getVariable(String varname,String defval) {
   return defval;
 }
 String Conf::getVariable(String varname) {
-  int8_t pos = variables.indexOf(varname + equal);
+  int8_t pos = variables.indexOf(varname + equ);
   if (pos == -1) return ("");
-  String first = variables.substring(pos + varname.length() + equal.length());
+  String first = variables.substring(pos + varname.length() + equ.length());
   pos = first.indexOf("\n");
   first = first.substring(0, pos);
   first.trim();
   return first;
 }
 char* Conf::getVariableChar(String varname) {
-  return (char *)varname.c_str();
+  return (char *)varname.c_str();  // ESTA MAL , NO DEVUELVE VALOR
 }
+
+

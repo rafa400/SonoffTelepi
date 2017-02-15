@@ -73,4 +73,19 @@ bool TeWifi::modeWifiClient() {
   mdns.begin("esp8266", WiFi.localIP());
   return true;
 }
+bool TeWifi::checkWifi() {
+  if (WiFi.status() != WL_CONNECTED) {
+    WiFi.disconnect();
+    int i=0;
+    while ((WiFi.status() != WL_DISCONNECTED) && (i<20)) {
+       delay(500); i++;
+    }
+    WiFi.begin(ssid.c_str(), pass.c_str());
+    i=0;
+    while ((WiFi.status() != WL_CONNECTED) && (i<20)) {
+       delay(500); i++;
+    }
+  }
+  return (WiFi.status() == WL_CONNECTED);
+}
 
