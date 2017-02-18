@@ -54,20 +54,19 @@ void TeWebServer::defineWeb() {
     WebS->httpServer->send(200, "text/html", workmodehtml );
     delay(100);
   });
-  
+
   httpServer->on("/wifisetup.html", []() {
     String content = " ";  // Meter un espacio en blanco en sprintf cuelga!!
-    
+
     if (WebS->httpServer->args() > 0 ) {
       for ( uint8_t i = 0; i < WebS->httpServer->args(); i++ ) {
-        //if (httpServer.argName(i) == "fname") {
           content = content + "\r\n" + WebS->httpServer->argName(i) + "--" + WebS->httpServer->arg(i);
           configure->setVariable( WebS->httpServer->argName(i),WebS->httpServer->arg(i));
-        //}
       }
-      //config->save();
+      configure->setUserPassword("admin","admin");
+      configure->save();
     }
-    
+
     String wifisetuphtml(wifisetuphtmlchar);
 
   /*
@@ -76,6 +75,11 @@ void TeWebServer::defineWeb() {
     int hr = min / 60;
     content.c_str(), hr, min % 60, sec % 60);
   */
+    wifisetuphtml.replace("%a1s",configure->getVariable("hostname",tewifi->def_hostname));
+    wifisetuphtml.replace("%a2s"," ");
+    wifisetuphtml.replace("%a3s","selected=\"selected\"");
+    wifisetuphtml.replace("%a4s"," ");    
+  
     wifisetuphtml.replace("%1s","selected=\"selected\"");
     wifisetuphtml.replace("%2s"," ");
     wifisetuphtml.replace("%3s",configure->getVariable("Wifi_IP","100.100.100.5"));
@@ -83,9 +87,8 @@ void TeWebServer::defineWeb() {
     wifisetuphtml.replace("%5s",configure->getVariable("Wifi_MSK","255.255.255.0"));
     wifisetuphtml.replace("%6s",configure->getVariable("Wifi_DNS","8.8.8.8"));
     wifisetuphtml.replace("Uptime",content);
-    
+
     WebS->httpServer->send(200, "text/html", (wifisetuphtml).c_str());
-    configure->save();
     delay(100);
   });
 

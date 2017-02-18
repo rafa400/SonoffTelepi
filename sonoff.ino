@@ -8,7 +8,7 @@
    @brief mDNS and OTA Constants
    @{
 */
-#define HOSTNAME "ESP8266-OTA-" ///< Hostename. The setup function adds the Chip ID at the end.
+
 #define MQTT_SERVER "192.168.2.9"  // My mosquitto server
 /// @}
 

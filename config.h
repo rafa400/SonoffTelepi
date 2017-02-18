@@ -2,6 +2,7 @@
 #define TELEPICONFIG_H
 
 #include <FS.h>
+#include "MD5.h"
 
 // ******************************************************************************************************
 // **       Config management        **
@@ -27,7 +28,9 @@ class Conf {
     String getVariable(String varname);
     String getVariable(String varname, String defval);
     String setVariable(String varname, String defval);
-    char* getVariableChar(String varname);
+    bool checkUserPassword(String user,String password);
+    bool checkUserMD5Password(String user,String password);
+    void setUserPassword(String user,String password);
     static String getFirstVar(String *text, String separator);
   private:
     pair myvar[pair_max+1];

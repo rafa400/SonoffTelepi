@@ -13,9 +13,9 @@ bool Conf::load() {
   if (!configFile) return false;
   while ((maxv<pair_max) && (configFile.available()>0)) {
     n=configFile.readBytesUntil(':',myvar[maxv].variable,l_max);
-    myvar[maxv].variable[n-1]=0;
+    myvar[maxv].variable[n]=0;
     n=configFile.readBytesUntil('\n',myvar[maxv].value,l_max);
-    myvar[maxv].value[n-1]=0;
+    myvar[maxv].value[n]=0;
     maxv++;
   }
   configFile.close();
@@ -89,8 +89,25 @@ String Conf::setVariable(String varname,String defval) {
   return defval;
 }
 
-char* Conf::getVariableChar(String varname) {
-  return (char *)varname.c_str();  // ESTA MAL , NO DEVUELVE VALOR
+bool Conf::checkUserPassword(String user,String password){
+  char passwd[35]; // Max MD5 typically 32 hex digits
+  strcpy(passwd,password.c_str());
+  unsigned char* hash=MD5::make_hash(passwd);
+  char *md5str = MD5::make_digest(hash, 16);
+  free(hash);
+  return (getVariable("user_"+user)==String(md5str)?true:false);
+}
+bool Conf::checkUserMD5Password(String user,String md5password){
+  return (getVariable("user_"+user)==md5password?true:false);
+}
+
+void Conf::setUserPassword(String user,String password){
+  char passwd[35]; // Max MD5 typically 32 hex digits
+  strcpy(passwd,password.c_str());
+  unsigned char* hash=MD5::make_hash(passwd);
+  char *md5str = MD5::make_digest(hash, 16);
+  free(hash);
+  setVariable("user_"+user,String(md5str));
 }
 
 

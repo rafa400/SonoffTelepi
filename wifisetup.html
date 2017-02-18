@@ -19,11 +19,12 @@ R"=====(<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN"  "http://www.w3.org/TR
    </article>
    <article class="form">
      <div>Host Name</div>
-     <input type="text" name="hostname" placeholder="hostame" maxlength="15">
+     <input type="text" name="hostname" placeholder="hostame" value="%a1s" maxlength="15">
      <div>Wifi Mode</div>
      <select id="wifimode">
-       <option value="AP">Access Point</option>
-       <option value="CLI" selected="selected">Client</option>
+       <option value="AP" %a2s>Access Point</option>
+       <option value="CLI" %a3s>Client</option>
+       <option value="PA2" %a4s>PointA2</option>       
      </select>
      <article class="title">
        <span>LAN Config</span>

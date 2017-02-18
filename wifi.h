@@ -1,3 +1,16 @@
+#include <FileIO.h>
+#include <Console.h>
+#include <BridgeSSLClient.h>
+#include <BridgeUdp.h>
+#include <Mailbox.h>
+#include <Process.h>
+#include <YunClient.h>
+#include <HttpClient.h>
+#include <BridgeClient.h>
+#include <YunServer.h>
+#include <Bridge.h>
+#include <BridgeServer.h>
+
 #ifndef TELEPIWIFI_H
 #define TELEPIWIFI_H
 
@@ -14,9 +27,14 @@
 // https://github.com/sticilface/ESPmanager -- Trabajo perfecto!!!
 // https://www.arduino.cc/en/Reference/WiFi
 
+// Hostname. The setup function adds the Chip ID at the end.
+#define HOSTNAME "ESP8266-OTA-"
+  
+
 class TeWifi {
   public:
     String hostname;
+    String def_hostname;
     int modeAP;
     String ssid;
     String pass;
