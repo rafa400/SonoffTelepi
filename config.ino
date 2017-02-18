@@ -3,40 +3,55 @@
 #include "config.h"
 
 Conf::Conf() {
-  variables = " ";
   load();
-  maxv=0;
 }
 bool Conf::load() {
+  SPIFFS.begin();
   File configFile = SPIFFS.open("/config.txt", "r");
   maxv=0;
+  int n;
   if (!configFile) return false;
   while ((maxv<pair_max) && (configFile.available()>0)) {
-    myvar[maxv].variable=configFile.readBytesUntil(':');
-    myvar[maxv].value=configFile.readBytesUntil('\n');
+    n=configFile.readBytesUntil(':',myvar[maxv].variable,l_max);
+    myvar[maxv].variable[n-1]=0;
+    n=configFile.readBytesUntil('\n',myvar[maxv].value,l_max);
+    myvar[maxv].value[n-1]=0;
     maxv++;
   }
   configFile.close();
+  SPIFFS.end();
   return true;
 }
 bool Conf::save() {
+  SPIFFS.begin();
   File configFile = SPIFFS.open("/config.txt", "w");
   if (!configFile) return false;
   for(int i=0;i<maxv;i++) {
-    configFile.print(myvar[i].variable+":");
-    configFile.print(myvar[i].valor+"\n");
+    configFile.print(String(myvar[i].variable)+":");
+    configFile.print(String(myvar[i].value)+"\n");
   }
   configFile.close();
+  SPIFFS.end();
   return true;
 }
-String Conf::getConfig() {
-  return variables;
+bool Conf::reset() {
+  maxv=0;
+  save();
 }
-void Conf::setConfig(String vars) {
-  variables = vars;
+String Conf::readConfig() {
+  SPIFFS.begin();
+  File configFile = SPIFFS.open("/config.txt", "r");
+  String content = "EMPTY!";
+  if (configFile) content = configFile.readString();
+  configFile.close();
+  SPIFFS.end();
+  return content;
 }
+
 void Conf::addConfig(String varname, String varval) {
-  variables = variables + varname + "=>" + varval + "\r\n";
+  strcpy(myvar[maxv].variable,varname.c_str());
+  strcpy(myvar[maxv].value,varval.c_str());
+  maxv++;
 }
 String Conf::getFirstVar(String *text, String separator) {
   int8_t pos = text->indexOf(separator);
@@ -54,14 +69,26 @@ String Conf::getVariable(String varname,String defval) {
   return defval;
 }
 String Conf::getVariable(String varname) {
-  int8_t pos = variables.indexOf(varname + equ);
-  if (pos == -1) return ("");
-  String first = variables.substring(pos + varname.length() + equ.length());
-  pos = first.indexOf("\n");
-  first = first.substring(0, pos);
-  first.trim();
-  return first;
+  int i=0;
+  while (i<maxv) {
+    if (varname==String(myvar[i].variable)) return String(myvar[i].value);
+    i++;
+  }
+  return "";
 }
+String Conf::setVariable(String varname,String defval) {
+  int i=0;
+  while (i<maxv) {
+    if (varname==String(myvar[i].variable)) {
+       strcpy(myvar[i].value,defval.c_str());
+       return defval;
+    }
+    i++;
+  }
+  addConfig(varname, defval);
+  return defval;
+}
+
 char* Conf::getVariableChar(String varname) {
   return (char *)varname.c_str();  // ESTA MAL , NO DEVUELVE VALOR
 }

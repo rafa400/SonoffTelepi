@@ -8,10 +8,11 @@
 // ************************************
 
 #define pair_max 20  // Max number of variables
+#define l_max 30     // Max length of variables
 
 struct pair {
-   String variable;
-   String value;
+   char variable[l_max+1];
+   char value[l_max+1];
 };
 
 
@@ -20,17 +21,16 @@ class Conf {
     Conf();
     bool load();
     bool save();
-    String getConfig();
-    void setConfig(String vars);
+    bool reset();
+    String readConfig();
     void addConfig(String varname, String varval);
-    static String getFirstVar(String *text, String separator);
     String getVariable(String varname);
     String getVariable(String varname, String defval);
+    String setVariable(String varname, String defval);
     char* getVariableChar(String varname);
+    static String getFirstVar(String *text, String separator);
   private:
     pair myvar[pair_max+1];
-    String variables;
-    const String equ = "=>";
     int maxv;
 };
 

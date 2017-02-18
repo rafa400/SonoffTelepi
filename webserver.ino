@@ -62,6 +62,7 @@ void TeWebServer::defineWeb() {
       for ( uint8_t i = 0; i < WebS->httpServer->args(); i++ ) {
         //if (httpServer.argName(i) == "fname") {
           content = content + "\r\n" + WebS->httpServer->argName(i) + "--" + WebS->httpServer->arg(i);
+          configure->setVariable( WebS->httpServer->argName(i),WebS->httpServer->arg(i));
         //}
       }
       //config->save();
@@ -69,23 +70,12 @@ void TeWebServer::defineWeb() {
     
     String wifisetuphtml(wifisetuphtmlchar);
 
-    /*
-    char buffer[wifisetuphtml.length() + 1000];
-
+  /*
     int sec = millis() / 1000;
     int min = sec / 60;
     int hr = min / 60;
-
-    sprintf(buffer, wifisetuphtmlchar, "selected=\"selected\"", " ", 
-    "100.100.100.5", //configure->getVariable("Wifi_IP","100.100.100.5").c_str(),
-    "100.100.100.1", //configure->getVariable("Wifi_GW","100.100.100.1").c_str(),
-    "255.255.255.0", //configure->getVariable("Wifi_MSK","255.255.255.0").c_str(),
-    "8.8.8.8", //configure->getVariable("Wifi_DNS","8.8.8.8").c_str(), 
     content.c_str(), hr, min % 60, sec % 60);
-    
-    WebS->httpServer->send(200, "text/html", buffer );
-
-    */
+  */
     wifisetuphtml.replace("%1s","selected=\"selected\"");
     wifisetuphtml.replace("%2s"," ");
     wifisetuphtml.replace("%3s",configure->getVariable("Wifi_IP","100.100.100.5"));
@@ -95,7 +85,7 @@ void TeWebServer::defineWeb() {
     wifisetuphtml.replace("Uptime",content);
     
     WebS->httpServer->send(200, "text/html", (wifisetuphtml).c_str());
-    
+    configure->save();
     delay(100);
   });
 
@@ -112,11 +102,7 @@ void TeWebServer::defineWeb() {
   });
 
   httpServer->on("/config.txt", []() {
-    File configFile = SPIFFS.open("/config.txt", "r");
-    String content = "EMPTY!";
-    if (configFile) content = configFile.readString();
-    configFile.close();
-    WebS->httpServer->send(200, "text/css", content );
+    WebS->httpServer->send(200, "text/plain", configure->readConfig() );
     delay(100);
   });
   httpServer->on("/admin", []() { // http://stackoverflow.com/questions/39688410/how-to-switch-to-normal-wifi-mode-to-access-point-mode-esp8266
@@ -128,6 +114,7 @@ void TeWebServer::defineWeb() {
   httpServer->onNotFound( []() {
     String indexhtml(indexhtmlchar);
     WebS->httpServer->send(200, "text/html", indexhtml );
+    configure->reset();
     delay(100);
   });
 }
