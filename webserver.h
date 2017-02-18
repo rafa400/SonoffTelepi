@@ -24,6 +24,9 @@ const char *gradientsvgchar =
 #include "/root/Arduino/sonoff/gradient.svg"
   ;
 
+#define SELECTEDdef(var,option,defvar) (configure->getVariable(var,defvar)==option?"selected=\"selected\"":" ")
+#define SELECTED(var,option) (configure->getVariable(var)==option?"selected=\"selected\"":" ")
+
 class TeWebServer {
   public:
     TeWebServer();
@@ -40,3 +43,4 @@ class TeWebServer {
 
 
 #endif //TELEPIWEBSERVER_H
+

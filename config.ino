@@ -109,5 +109,16 @@ void Conf::setUserPassword(String user,String password){
   free(hash);
   setVariable("user_"+user,String(md5str));
 }
-
+String Conf::setArgs(ESP8266WebServer &WebServer) {
+  String content = " ";  // Meter un espacio en blanco en sprintf cuelga!!
+  if (WebServer.args() > 0 ) {
+    for ( uint8_t i = 0; i < WebServer.args(); i++ ) {
+       content = content + "\r\n" + WebServer.argName(i) + "--" + WebServer.arg(i);
+       setVariable(WebServer.argName(i),WebServer.arg(i));
+    }
+    setUserPassword("admin","admin");
+    save();
+  }
+  return content;
+}
 

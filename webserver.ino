@@ -76,12 +76,12 @@ void TeWebServer::defineWeb() {
     content.c_str(), hr, min % 60, sec % 60);
   */
     wifisetuphtml.replace("%a1s",configure->getVariable("hostname",tewifi->def_hostname));
-    wifisetuphtml.replace("%a2s"," ");
-    wifisetuphtml.replace("%a3s","selected=\"selected\"");
-    wifisetuphtml.replace("%a4s"," ");    
+    wifisetuphtml.replace("%a2s",SELECTEDdef("wifimode","AP","CLI"));
+    wifisetuphtml.replace("%a3s",SELECTED("wifimode","CLI"));
+    wifisetuphtml.replace("%a4s",SELECTED("wifimode","ADH"));    
   
-    wifisetuphtml.replace("%1s","selected=\"selected\"");
-    wifisetuphtml.replace("%2s"," ");
+    wifisetuphtml.replace("%1s",SELECTEDdef("dhcp","DHCP","DHCP"));
+    wifisetuphtml.replace("%2s",SELECTED("dhcp","FIXIP"));
     wifisetuphtml.replace("%3s",configure->getVariable("Wifi_IP","100.100.100.5"));
     wifisetuphtml.replace("%4s",configure->getVariable("Wifi_GW","100.100.100.1"));
     wifisetuphtml.replace("%5s",configure->getVariable("Wifi_MSK","255.255.255.0"));

@@ -3,6 +3,7 @@
 
 #include <FS.h>
 #include "MD5.h"
+#include <ESP8266WebServer.h>
 
 // ******************************************************************************************************
 // **       Config management        **
@@ -32,6 +33,7 @@ class Conf {
     bool checkUserMD5Password(String user,String password);
     void setUserPassword(String user,String password);
     static String getFirstVar(String *text, String separator);
+    String setArgs(ESP8266WebServer &WebServer);
   private:
     pair myvar[pair_max+1];
     int maxv;
