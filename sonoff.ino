@@ -8,7 +8,6 @@
    @brief mDNS and OTA Constants
    @{
 */
-
 #define MQTT_SERVER "192.168.2.9"  // My mosquitto server
 /// @}
 

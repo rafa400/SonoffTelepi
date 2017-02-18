@@ -1,16 +1,3 @@
-#include <FileIO.h>
-#include <Console.h>
-#include <BridgeSSLClient.h>
-#include <BridgeUdp.h>
-#include <Mailbox.h>
-#include <Process.h>
-#include <YunClient.h>
-#include <HttpClient.h>
-#include <BridgeClient.h>
-#include <YunServer.h>
-#include <Bridge.h>
-#include <BridgeServer.h>
-
 #ifndef TELEPIWIFI_H
 #define TELEPIWIFI_H
 
@@ -21,6 +8,7 @@
 
 // #include <WiFiUdp.h>
 
+
 // ******************************************************************************************************
 // **       WIFI management        **
 // **********************************
@@ -29,7 +17,6 @@
 
 // Hostname. The setup function adds the Chip ID at the end.
 #define HOSTNAME "ESP8266-OTA-"
-  
 
 class TeWifi {
   public:

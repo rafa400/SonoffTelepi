@@ -3,16 +3,15 @@
 #include <ESP8266mDNS.h>
 
 #include "wifi.h"
-//#include "config.h"
 
 TeWifi::TeWifi(void) {
   dhcp = true;
   ssid = "KITIPASA";
   pass = "<kitipasa>";
   // Set Hostname.
-//  def_hostname = HOSTNAME + String(ESP.getChipId(), HEX);
-//  hostname =  configure->getVariable("hostname", def_hostname );
-//  configure->save();
+  def_hostname = HOSTNAME + String(ESP.getChipId(), HEX);
+  hostname =  configure->getVariable("hostname", def_hostname );
+  configure->save();
   WiFi.hostname(hostname);
 }
 TeWifi::TeWifi(Conf *conf) {
