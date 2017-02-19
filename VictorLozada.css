@@ -2,10 +2,14 @@ R"=====(/*The Google Font*/
 /*@import url(http://fonts.googleapis.com/css?family=Open+Sans:600);*/
 /* Modifications for TelePi by Rafael Gandia-Castello */
 body{
-  background:url(gradient.svg);
   background-size: cover;
   font-family: 'Open Sans', sans-serif;
   margin:50px auto;
+  background: red; /* For browsers that do not support gradients */
+  background: -webkit-linear-gradient(left top, #16093e, #d69a54); /* For Safari 5.1 to 6.0 */
+  background: -o-linear-gradient(bottom right, #16093e, #d69a54); /* For Opera 11.1 to 12.0 */
+  background: -moz-linear-gradient(bottom right, #16093e, #d69a54); /* For Firefox 3.6 to 15 */
+  background: linear-gradient(to bottom right, #16093e, #d69a54); /* Standard syntax */
 }
 .cform{
   margin:auto;

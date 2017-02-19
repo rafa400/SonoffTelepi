@@ -27,6 +27,12 @@ boolean TeWebServer::authenticate() {
   }
 }
 
+void  TeWebServer::gotoIndexHTML() {
+  String indexhtml("<meta http-equiv=\"refresh\" content=\"0; url=/index.html\" />");
+  WebS->httpServer->send(200, "text/html", indexhtml );    
+}
+
+
 void TeWebServer::defineWeb() {
 
   httpServer->on("/", []() {
@@ -54,40 +60,39 @@ void TeWebServer::defineWeb() {
     WebS->httpServer->send(200, "text/html", workmodehtml );
     delay(100);
   });
+  httpServer->on("/mqtthtml.html", []() {
+    String mqtthtml(mqtthtmlchar);
+    WebS->httpServer->send(200, "text/html", mqtthtml );
+    delay(100);
+  });
 
   httpServer->on("/wifisetup.html", []() {
-    String content = " ";  // Meter un espacio en blanco en sprintf cuelga!!
-
-    if (WebS->httpServer->args() > 0 ) {
-      for ( uint8_t i = 0; i < WebS->httpServer->args(); i++ ) {
-          content = content + "\r\n" + WebS->httpServer->argName(i) + "--" + WebS->httpServer->arg(i);
-          configure->setVariable( WebS->httpServer->argName(i),WebS->httpServer->arg(i));
-      }
-      configure->setUserPassword("admin","admin");
-      configure->save();
+    if ( ! configure->setArgs(*WebS->httpServer) ) {
+      WebS->gotoIndexHTML();
+      return;
     }
-
-    String wifisetuphtml(wifisetuphtmlchar);
-
-  /*
     int sec = millis() / 1000;
     int min = sec / 60;
     int hr = min / 60;
-    content.c_str(), hr, min % 60, sec % 60);
-  */
-    wifisetuphtml.replace("%a1s",configure->getVariable("hostname",tewifi->def_hostname));
-    wifisetuphtml.replace("%a2s",SELECTEDdef("wifimode","AP","CLI"));
-    wifisetuphtml.replace("%a3s",SELECTED("wifimode","CLI"));
-    wifisetuphtml.replace("%a4s",SELECTED("wifimode","ADH"));    
-  
-    wifisetuphtml.replace("%1s",SELECTEDdef("dhcp","DHCP","DHCP"));
-    wifisetuphtml.replace("%2s",SELECTED("dhcp","FIXIP"));
-    wifisetuphtml.replace("%3s",configure->getVariable("Wifi_IP","100.100.100.5"));
-    wifisetuphtml.replace("%4s",configure->getVariable("Wifi_GW","100.100.100.1"));
-    wifisetuphtml.replace("%5s",configure->getVariable("Wifi_MSK","255.255.255.0"));
-    wifisetuphtml.replace("%6s",configure->getVariable("Wifi_DNS","8.8.8.8"));
-    wifisetuphtml.replace("Uptime",content);
+    String wifisetuphtml(wifisetuphtmlchar);
+    String parameters[][2]={
+       {"%a1s",configure->getVariable("hostname",tewifi->def_hostname)},
+       {"%a2s",SELECTEDdef("wifimode","AP","CLI")},
+       {"%a3s",SELECTED("wifimode","CLI")},
+       {"%a4s",SELECTED("wifimode","ADH")},
+       {"%a5s",configure->getVariable("wifiSSID","TELEPI")},
+       {"%a6s",configure->getVariable("wifipassword","kitipasa")},
+       
 
+       {"%1s",SELECTEDdef("dhcp","DHCP","DHCP")},
+       {"%2s",SELECTED("dhcp","FIXIP")},
+       {"%3s",configure->getVariable("Wifi_IP","100.100.100.5")},
+       {"%4s",configure->getVariable("Wifi_GW","100.100.100.1")},
+       {"%5s",configure->getVariable("Wifi_MSK","255.255.255.0")},
+       {"%6s",configure->getVariable("Wifi_DNS","8.8.8.8")},
+       {"%time",String(hr)+":"+String(min)+":"+String(sec)}
+    };
+    for(int i=0;i<sizeof(parameters)/sizeof(parameters[0]);i++) wifisetuphtml.replace(parameters[i][0],parameters[i][1]);
     WebS->httpServer->send(200, "text/html", (wifisetuphtml).c_str());
     delay(100);
   });
@@ -108,6 +113,12 @@ void TeWebServer::defineWeb() {
     WebS->httpServer->send(200, "text/plain", configure->readConfig() );
     delay(100);
   });
+  httpServer->on("/resetconfig", []() {
+    configure->reset();
+    WebS->gotoIndexHTML();
+    delay(100);
+    ESP.reset();
+  });  
   httpServer->on("/admin", []() { // http://stackoverflow.com/questions/39688410/how-to-switch-to-normal-wifi-mode-to-access-point-mode-esp8266
     if (WebS->authenticate()) { // También es utilidad para subir ficheros
       WebS->httpServer->send(200, "text/html", "HOLA");
@@ -117,7 +128,6 @@ void TeWebServer::defineWeb() {
   httpServer->onNotFound( []() {
     String indexhtml(indexhtmlchar);
     WebS->httpServer->send(200, "text/html", indexhtml );
-    configure->reset();
     delay(100);
   });
 }

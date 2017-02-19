@@ -23,6 +23,10 @@ const char *wifisetuphtmlchar =
 const char *gradientsvgchar =
 #include "/root/Arduino/sonoff/gradient.svg"
   ;
+const char *mqtthtmlchar =
+#include "/root/Arduino/sonoff/mqtt.html"
+  ;
+
 
 #define SELECTEDdef(var,option,defvar) (configure->getVariable(var,defvar)==option?"selected=\"selected\"":" ")
 #define SELECTED(var,option) (configure->getVariable(var)==option?"selected=\"selected\"":" ")
@@ -37,7 +41,8 @@ class TeWebServer {
     boolean authenticate();
     String jsonPage = "";
   private:
-     void defineWeb();     
+     void defineWeb();   
+     void gotoIndexHTML();
      Conf *co;
 };
 

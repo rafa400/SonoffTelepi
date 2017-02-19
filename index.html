@@ -7,9 +7,9 @@ R"=====(<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN"  "http://www.w3.org/TR
  function booting() {
     //document.getElementById("workmode").onclick = function () {  location.href = "workmode.html";  };
     document.getElementById("wifisetup").onclick = function () {  location.href = "wifisetup.html";  };
+    document.getElementById("workmode").onclick = function () {  location.href = "workmode.html";  };
+    document.getElementById("mqtt").onclick = function () {  location.href = "mqtt.html";  };
     document.getElementById("update").onclick = function () {  location.href = "update";  };
-    document.getElementById("workmode").onclick = function () {  location.href = "workmode";  };
-
   }
 </script>
 </head>
@@ -19,10 +19,13 @@ R"=====(<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN"  "http://www.w3.org/TR
      <span>Telepi ESP8266 MENU</span>
    </article>
    <article class="btn">
+     <input id="wifisetup" type="submit" value="Wifi Setup">
+   </article>
+   <article class="btn">
      <input id="workmode" type="submit" value="Work Mode">
    </article>
    <article class="btn">
-     <input id="wifisetup" type="submit" value="Wifi Setup">
+     <input id="mqtt" type="submit" value="MQTT config">
    </article>
    <article class="btn">
      <input id="update" type="submit" value="Firmware Update">
