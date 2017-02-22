@@ -1,27 +1,103 @@
-R"=====(
-<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN"  "http://www.w3.org/TR/html4/strict.dtd">
+R"=====(<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN"  "http://www.w3.org/TR/html4/strict.dtd">
 <html>
 <head>
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-<link href="milligram.min.css" type="text/css" rel="stylesheet"/>
+   <link href="VictorLozada.css" type="text/css" rel="stylesheet"/>
+<script type="text/javascript">
+ function booting() {
+    //document.getElementById("workmode").onclick = function () {  location.href = "workmode.html";  };
+    //document.getElementById("wifisetup").onclick = function () {  location.href = "wifisetup.html";  };
+  //  document.getElementById("cancel").onclick = function () {  location.href = "index.html";  };
+  }
+</script>
 </head>
-<body>
-<div id="wrapper">
-
-<div id="contact_form_div">
- <p id="contact_label">WORK MODE</p>
- <form method="post" action="">
-  <p>MODE<input type="text" placeholder="Enter Name"></p>
-  <p>IPv4 address<input type="text" placeholder="Enter Name"></p>
-  <p>IPv4 netmask<input type="text" placeholder="Enter Email"></p>
-  <p><input type="text" placeholder="Enter Contact No"></p>
-  <p><textarea placeholder="Enter Message"></textarea></p>
-  <p><input type="submit" value="QUIT"></p><p><input type="submit" value="SAVE"></p>
- </form>
+<body onload="booting()">
+<form method="post">
+ <section class="cform">
+   <article class="title">
+     <span>GPIO Config</span>
+   </article>
+   <article class="form">
+    <!-- <img src="sonoff.svg"  width="98%"   text-align=center /> -->
+     <style type="text/css">
+.tg  {border-collapse:collapse;border-spacing:0;}
+.tg td{font-family:Arial, sans-serif;font-size:14px;padding:10px 5px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;}
+.tg th{font-family:Arial, sans-serif;font-size:14px;font-weight:normal;padding:10px 5px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;}
+.tg .tg-yw4l{vertical-align:top}
+.tg .tg-baqh{text-align:center;vertical-align:top}
+select{text-align:center;vertical-align:top;width:25px}
+option{text-align:center;vertical-align:top;width:25px}
+</style>
+<div style="width:90%;margin-left:0px;text-align:center">
+     <table class="tg">
+       <tr>
+         <th class="tg-yw4l"></th>
+         <th class="tg-yw4l"></th>
+         <th class="tg-yw4l">Switch</th>
+         <th class="tg-yw4l">Button</th>
+       </tr>
+       <tr>
+         <td class="tg-baqh">Relay</td>
+         <td class="tg-baqh">OUT</td>
+         <td class="tg-baqh"></td>
+         <td class="tg-baqh"></td>
+       </tr>
+       <tr>
+         <td class="tg-baqh">Led</td>
+         <td class="tg-baqh">OUT<br></td>
+         <td class="tg-baqh"></td>
+         <td class="tg-baqh"></td>
+       </tr>
+       <tr>
+         <td class="tg-baqh">Button</td>
+         <td class="tg-baqh">IN<br></td>
+         <td class="tg-baqh"><input type="radio" name="gpio00sw" value="switch"></td>
+         <td class="tg-baqh"><input type="radio" name="gpio00sw" value="push" checked="checked"></td>
+       </tr>
+       <tr>
+         <td class="tg-baqh">GPIO14<br></td>
+         <td class="tg-baqh">
+           <select class=rafa  id="gpio14" name="gpio14">
+             <option value="IN">IN</option>
+             <option value="OUT">OUT</option>
+             <option selected="selected" value="NU">N/U</option>
+           </select>
+         </td>
+         <td class="tg-baqh"><input type="radio" name="gpio14sw" value="switch" checked="checked"></td>
+         <td class="tg-baqh"><input type="radio" name="gpio14sw" value="push"></td>
+       </tr>
+       <tr>
+         <td class="tg-baqh">GPIO01<br></td>
+         <td class="tg-baqh">
+           <select class=rafa  id="gpio01" name="gpio01">
+             <option value="IN">IN</option>
+             <option value="OUT">OUT</option>
+             <option selected="selected" value="NU">N/U</option>
+           </select>
+         </td>
+         <td class="tg-baqh"><input type="radio" name="gpio01sw" value="switch" checked="checked"></td>
+         <td class="tg-baqh"><input type="radio" name="gpio01sw" value="push"></td>
+       </tr>
+       <tr>
+         <td class="tg-baqh">GPIO03</td>
+         <td class="tg-baqh">
+           <select class=rafa  id="gpio03" name="gpio03">
+             <option value="IN">IN</option>
+             <option value="OUT">OUT</option>
+             <option selected="selected" value="NU">N/U</option>
+           </select>
+         </td>
+         <td class="tg-baqh"><input type="radio" name="gpio03sw" value="switch" checked="checked"></td>
+         <td class="tg-baqh"><input type="radio" name="gpio03sw" value="push"></td>
+       </tr>
+     </table>
 </div>
-
-</div>
+   </article>
+   <article class="btn">
+     <input id="wifisetup" type="submit" name="save" value="Save"><input id="cancel" type="submit" name="cancel" value="Cancel">
+   </article>
+ </section>
+</form>
 </body>
 </html>
-
 )====="

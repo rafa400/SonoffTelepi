@@ -51,21 +51,9 @@ void TeWebServer::defineWeb() {
     delay(100);
   });
   httpServer->on("/index.html", []() {
-    String indexhtml(indexhtmlchar);
     WebS->httpServer->send(200, "text/html", indexhtml );
     delay(100);
   });
-  httpServer->on("/workmode.html", []() {
-    String workmodehtml(workmodehtmlchar);
-    WebS->httpServer->send(200, "text/html", workmodehtml );
-    delay(100);
-  });
-  httpServer->on("/mqtthtml.html", []() {
-    String mqtthtml(mqtthtmlchar);
-    WebS->httpServer->send(200, "text/html", mqtthtml );
-    delay(100);
-  });
-
   httpServer->on("/wifisetup.html", []() {
     if ( ! configure->setArgs(*WebS->httpServer) ) {
       WebS->gotoIndexHTML();
@@ -74,7 +62,6 @@ void TeWebServer::defineWeb() {
     int sec = millis() / 1000;
     int min = sec / 60;
     int hr = min / 60;
-    String wifisetuphtml(wifisetuphtmlchar);
     String parameters[][2]={
        {"%a1s",configure->getVariable("hostname",tewifi->def_hostname)},
        {"%a2s",SELECTEDdef("wifimode","AP","CLI")},
@@ -92,23 +79,70 @@ void TeWebServer::defineWeb() {
        {"%6s",configure->getVariable("Wifi_DNS","8.8.8.8")},
        {"%time",String(hr)+":"+String(min)+":"+String(sec)}
     };
-    for(int i=0;i<sizeof(parameters)/sizeof(parameters[0]);i++) wifisetuphtml.replace(parameters[i][0],parameters[i][1]);
-    WebS->httpServer->send(200, "text/html", (wifisetuphtml).c_str());
+    String wifisetup=wifisetuphtml;
+    for(int i=0;i<sizeof(parameters)/sizeof(parameters[0]);i++) wifisetup.replace(parameters[i][0],parameters[i][1]);
+    WebS->httpServer->send(200, "text/html", wifisetup);
     delay(100);
   });
+  httpServer->on("/workmode.html", []() {
+    if ( ! configure->setArgs(*WebS->httpServer) ) {
+      WebS->gotoIndexHTML();
+      return;
+    }
+    String parameters[][2]={
+       {"%01",CHECKEDdef("gpio00sw","switch","push")},
+       {"%02",CHECKED("gpio00sw","push")},
+       {"%03",SELECTEDdef("gpio14","IN","NU")},
+       {"%04",SELECTED("gpio14","OUT")},
+       {"%05",SELECTED("gpio14","NU")},
+       {"%06",CHECKEDdef("gpio14sw","switch","switch")},
+       {"%07",CHECKED("gpio14sw","push")},
+       {"%08",SELECTEDdef("gpio01","IN","NU")},
+       {"%09",SELECTED("gpio01","OUT")},
+       {"%10",SELECTED("gpio01","NU")},
+       {"%11",CHECKEDdef("gpio01sw","switch","switch")},
+       {"%12",CHECKED("gpio01sw","push")},
+       {"%13",SELECTEDdef("gpio03","IN","NU")},
+       {"%14",SELECTED("gpio03","OUT")},
+       {"%15",SELECTED("gpio03","NU")},
+       {"%16",CHECKEDdef("gpio03sw","switch","switch")},
+       {"%17",CHECKED("gpio03sw","push")},
+    };    
+    String workmode=workmodehtml;
+    for(int i=0;i<sizeof(parameters)/sizeof(parameters[0]);i++) workmode.replace(parameters[i][0],parameters[i][1]);
+    WebS->httpServer->send(200, "text/html", workmode );
+    delay(100);
+  });
+  httpServer->on("/mqtt.html", []() {
+   EthernetClient client;
+    String mqtt="";
+   if (client.connect("192.168.2.12", 80)) {
+    Serial.println("connected");
+    // Make a HTTP request:
+    client.println("GET /caca.html HTTP/1.1");
+    client.println("Host: 192.168.2.12");
+    client.println("Connection: close");
+    client.println();
+    while (client.available()) {
+       char mqtt=mqtt+client.read();
+    }
+    if (!client.connected()) client.stop();
+   }
+    WebS->httpServer->send(200, "text/html", mqtt );
+    delay(100);
+  });
+
+/*
+  httpServer->on("/sonoff.svg", []() {
+    WebS->httpServer->send(200, "image/svg+xml", sonoffsvgchar );
+    delay(100);
+  });
+*/
 
   httpServer->on("/VictorLozada.css", []() {
-    String milligram(milligramchar);
-    WebS->httpServer->send(200, "text/css", milligram );
+    WebS->httpServer->send(200, "text/css", VictorLozada );
     delay(100);
   });
-  
-  httpServer->on("/gradient.svg", []() {
-    String gradient(gradientsvgchar);
-    WebS->httpServer->send(200, "image/svg+xml", gradient );
-    delay(100);
-  });
-
   httpServer->on("/config.txt", []() {
     WebS->httpServer->send(200, "text/plain", configure->readConfig() );
     delay(100);
@@ -126,7 +160,6 @@ void TeWebServer::defineWeb() {
   });
   
   httpServer->onNotFound( []() {
-    String indexhtml(indexhtmlchar);
     WebS->httpServer->send(200, "text/html", indexhtml );
     delay(100);
   });
