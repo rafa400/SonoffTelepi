@@ -5,17 +5,33 @@ TeWebServer::TeWebServer() {
 }
 
 TeWebServer::TeWebServer(int port) {
+  mdns = new MDNSResponder; //ESP8266mDNS;
+  mdns->begin("esp8266", WiFi.localIP());
   //co=NULL;
   jsonPage = "{ 'status':'success', 'count': 1, 'type':'Sonoff TelePi', 'time':'', 'hostname':'OpenWrt2', 'results':";
   httpServer = new ESP8266WebServer(port);
   httpUpdater = new ESP8266HTTPUpdateServer;
+  mdns->addService("http", "tcp", 80); 
   defineWeb();
   httpUpdater->setup(httpServer);
-  httpServer->begin();
+  
+  startAllServices();
 }
 TeWebServer::TeWebServer(int port,Conf *conf) {
   // co=conf;
   TeWebServer(80);
+}
+
+bool TeWebServer::startAllServices() {
+  // mdns->notifyAPChange();
+  //mdns->update();
+  httpServer->begin();
+  mdns->addService("http", "tcp", 80);  
+}
+bool TeWebServer::stopAllServices() {
+  // mdns->notifyAPChange();
+  mdns->update();
+  httpServer->stop();
 }
 
 boolean TeWebServer::authenticate() {
@@ -62,26 +78,29 @@ void TeWebServer::defineWeb() {
     int sec = millis() / 1000;
     int min = sec / 60;
     int hr = min / 60;
+    sec=sec%60;
+    min=min%60;
+    
     String parameters[][2]={
        {"%a1s",configure->getVariable("hostname",tewifi->def_hostname)},
        {"%a2s",SELECTEDdef("wifimode","AP","CLI")},
        {"%a3s",SELECTED("wifimode","CLI")},
        {"%a4s",SELECTED("wifimode","ADH")},
-       {"%a5s",configure->getVariable("wifiSSID","TELEPI")},
-       {"%a6s",configure->getVariable("wifipassword","kitipasa")},
+       {"%a5s",configure->getVariable("wifiSSID","KITIPASA")},
+       {"%a6s",configure->getVariable("wifipassword","<kitipasa>")},
        
 
        {"%1s",SELECTEDdef("dhcp","DHCP","DHCP")},
        {"%2s",SELECTED("dhcp","FIXIP")},
-       {"%3s",configure->getVariable("Wifi_IP","100.100.100.5")},
-       {"%4s",configure->getVariable("Wifi_GW","100.100.100.1")},
-       {"%5s",configure->getVariable("Wifi_MSK","255.255.255.0")},
-       {"%6s",configure->getVariable("Wifi_DNS","8.8.8.8")},
+       {"%3s",configure->getVariable("Wifi_IP")},
+       {"%4s",configure->getVariable("Wifi_GW")},
+       {"%5s",configure->getVariable("Wifi_MSK")},
+       {"%6s",configure->getVariable("Wifi_DNS")},
        {"%time",String(hr)+":"+String(min)+":"+String(sec)}
     };
     String wifisetup=wifisetuphtml;
     for(int i=0;i<sizeof(parameters)/sizeof(parameters[0]);i++) wifisetup.replace(parameters[i][0],parameters[i][1]);
-    WebS->httpServer->send(200, "text/html", wifisetup);
+    WebS->httpServer->send(200, "text/html",htmlhead+wifisetup+htmltail);
     delay(100);
   });
   httpServer->on("/workmode.html", []() {
@@ -110,7 +129,7 @@ void TeWebServer::defineWeb() {
     };    
     String workmode=workmodehtml;
     for(int i=0;i<sizeof(parameters)/sizeof(parameters[0]);i++) workmode.replace(parameters[i][0],parameters[i][1]);
-    WebS->httpServer->send(200, "text/html", workmode );
+    WebS->httpServer->send(200, "text/html", htmlhead+workmode+htmltail );
     delay(100);
   });
   httpServer->on("/mqtt.html", []() {
@@ -152,6 +171,16 @@ void TeWebServer::defineWeb() {
     WebS->gotoIndexHTML();
     delay(100);
     ESP.reset();
+  });  
+  httpServer->on("/cero", []() {
+    free(&VictorLozada);
+    free(&htmlhead);
+    free(&htmltail); 
+//    free(&indexhtml);
+    free(&wifisetuphtml);
+    free(&workmodehtml);
+    WebS->httpServer->send(200, "text/html", "CLEAR MADE" );
+    delay(100);
   });  
   httpServer->on("/admin", []() { // http://stackoverflow.com/questions/39688410/how-to-switch-to-normal-wifi-mode-to-access-point-mode-esp8266
     if (WebS->authenticate()) { // También es utilidad para subir ficheros

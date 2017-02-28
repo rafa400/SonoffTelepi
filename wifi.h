@@ -4,7 +4,6 @@
 #include <ESP8266WiFi.h>
 // #include <WiFiClient.h>
 #include <DNSServer.h>
-#include <ESP8266mDNS.h>
 
 // #include <WiFiUdp.h>
 
@@ -23,15 +22,8 @@ class TeWifi {
     String hostname;
     String def_hostname;
     int modeAP;
-    String ssid;
-    String pass;
-    bool dhcp;
-    String apIP;
-    String apGTW;
-    String apMSK;
     int apChannel;
     bool apVisible;
-    MDNSResponder mdns;
     DNSServer dnsServer;
     static IPAddress parseIP(String ip);
     TeWifi();
@@ -40,8 +32,7 @@ class TeWifi {
     bool modeDefaultWifiAP();
     bool modeWifiClient();
     bool checkWifi();
-  private:
-    Conf *co;
+
 };
 
 #endif //TELEPIWIFI_H

@@ -9,14 +9,14 @@ bool Conf::load() {
   SPIFFS.begin();
   File configFile = SPIFFS.open("/config.txt", "r");
   maxv=0;
-  int n;
+  int n1,n2;
   if (!configFile) return false;
   while ((maxv<pair_max) && (configFile.available()>0)) {
-    n=configFile.readBytesUntil(':',myvar[maxv].variable,l_max);
-    myvar[maxv].variable[n]=0;
-    n=configFile.readBytesUntil('\n',myvar[maxv].value,l_max);
-    myvar[maxv].value[n]=0;
-    maxv++;
+    n1=configFile.readBytesUntil(':',myvar[maxv].variable,l_max);
+    myvar[maxv].variable[n1]=0;
+    n2=configFile.readBytesUntil('\n',myvar[maxv].value,l_max);
+    myvar[maxv].value[n2]=0;
+    if (n1>0 && n2>0)  maxv++;
   }
   configFile.close();
   SPIFFS.end();

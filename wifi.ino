@@ -5,9 +5,13 @@
 #include "wifi.h"
 
 TeWifi::TeWifi(void) {
-  dhcp = true;
-  ssid = "KITIPASA";
-  pass = "<kitipasa>";
+  configure->getVariable("wifiSSID","KITIPASA");
+  configure->getVariable("wifipassword","<kitipasa>");
+  configure->getVariable("Wifi_IP","192.168.0.20");
+  configure->getVariable("Wifi_GW","192.168.0.1");
+  configure->getVariable("Wifi_MSK","255.255.255.0");
+  configure->getVariable("Wifi_DNS","8.8.8.8");
+  
   // Set Hostname.
   def_hostname = HOSTNAME + String(ESP.getChipId(), HEX);
   hostname =  configure->getVariable("hostname", def_hostname );
@@ -16,25 +20,7 @@ TeWifi::TeWifi(void) {
 }
 TeWifi::TeWifi(Conf *conf) {
   TeWifi();
-  co = conf;
 
-  hostname = HOSTNAME + String(ESP.getChipId(), HEX);
-  WiFi.hostname(hostname);
-
-
-  dhcp = true; // (conf->getVariable("dhcp") == "false" ? false : true);
-/*
-  ssid = conf->getVariable("ssid");
-  ssid = (ssid == "" ? "KITIPASA" : ssid);
-  pass = conf->getVariable("pass");
-  pass = (pass == "" ? "<kitipasa>" : pass);
-*/
-  ssid = "KITIPASA";
-  pass = "<kitipasa>";
-
-  apIP = '192.168.0.1';
-  apGTW = '192.168.0.1';
-  apMSK = '255.255.255.0';
   apChannel = 7;
   apVisible = true;
 }
@@ -47,15 +33,15 @@ IPAddress TeWifi::parseIP(String ip) {
 }
 bool TeWifi::modeWifiAP() {
   WiFi.mode(WIFI_AP_STA);
-  WiFi.softAPConfig( TeWifi::parseIP(apIP), TeWifi::parseIP(apGTW), TeWifi::parseIP(apMSK) );
+  WiFi.softAPConfig( TeWifi::parseIP(configure->getVariable("Wifi_IP")), TeWifi::parseIP(configure->getVariable("Wifi_GW")), TeWifi::parseIP(configure->getVariable("Wifi_MSK")) );
   WiFi.softAP("TardisTime");
-  if (!WiFi.softAP(ssid.c_str(), pass.c_str(), apChannel, !apVisible )) {
+  if (!WiFi.softAP(configure->getVariable("wifiSSID").c_str(), configure->getVariable("wifipassword").c_str(), apChannel, !apVisible )) {
     return false;
   }
   return true;
 }
 bool TeWifi::modeDefaultWifiAP() {
-  WiFi.mode(WIFI_AP_STA);
+  WiFi.mode(WIFI_AP);
   WiFi.softAPConfig( TeWifi::parseIP("192.168.0.1"), TeWifi::parseIP("192.168.0.1"), TeWifi::parseIP("255.255.255.0") );
   WiFi.softAP("-TelePi-Sonoff-", "kitipasa" );
   if (!WiFi.softAP("-TelePi-Sonoff-", "kitipasa" )) {
@@ -65,24 +51,32 @@ bool TeWifi::modeDefaultWifiAP() {
   return true;
 }
 bool TeWifi::modeWifiClient() {
-  if (!dhcp) {  //(!(dhcp= (co->getVariable("Wifi_DHCP","true")=="true"?true:false)) ) {
-    
+  if (configure->getVariable("dhcp") == "FIXIP")
+    WiFi.config(  TeWifi::parseIP(configure->getVariable("Wifi_IP")),TeWifi::parseIP(configure->getVariable("Wifi_DNS")), TeWifi::parseIP(configure->getVariable("Wifi_GW")), TeWifi::parseIP(configure->getVariable("Wifi_MSK")) );
+  WiFi.begin(configure->getVariable("wifiSSID").c_str(), configure->getVariable("wifipassword").c_str());
+  int i=0;
+  while  ((WiFi.status() != WL_CONNECTED) && (i<20)) {
+    delay(500); i++;
   }
-  WiFi.begin(ssid.c_str(), pass.c_str());
-  if (dhcp) while (WiFi.status() != WL_CONNECTED) {
-      delay(500);
-    }
-  mdns.begin("esp8266", WiFi.localIP());
   return true;
 }
 bool TeWifi::checkWifi() {
+  if (WiFi.status() == WL_CONNECTED) {
+    // dnsServer.processNextRequest();
+    // WiFi.localIP(); // 0.0.0.0
+    return true;
+  }
+  int i=0;
+  while  ((WiFi.status() != WL_CONNECTED) && (i<20)) {
+    delay(500); i++;
+  }
   if (WiFi.status() != WL_CONNECTED) {
     WiFi.disconnect();
-    int i=0;
+    i=0;
     while ((WiFi.status() != WL_DISCONNECTED) && (i<20)) {
        delay(500); i++;
     }
-    WiFi.begin(ssid.c_str(), pass.c_str());
+    WiFi.begin(configure->getVariable("wifiSSID").c_str(),  configure->getVariable("wifipassword").c_str());
     i=0;
     while ((WiFi.status() != WL_CONNECTED) && (i<20)) {
        delay(500); i++;

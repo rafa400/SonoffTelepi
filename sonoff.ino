@@ -64,6 +64,7 @@ TeWebServer *WebS;
 
 void setup(void) {
   configure = new Conf();
+  // configure->reset();
   tewifi = new TeWifi(configure);
 
   pinMode(GPIO13Led, OUTPUT);
@@ -74,6 +75,8 @@ void setup(void) {
     blink(GPIO13Led, 500, 8);
     if (filter(GPIO00Button, LOW, 700)) { //Check if button is HIGH for ~700ms
       blink(GPIO13Led, 250, 16);
+      WiFi.mode(WIFI_AP_STA);
+      delay(500);
       WiFi.beginSmartConfig();
       while(1){
          delay(1000);
@@ -83,7 +86,8 @@ void setup(void) {
          }
       }
     }
-    tewifi->modeWifiAP();
+    configure->reset();
+    tewifi->modeDefaultWifiAP();
   } else {
     tewifi->modeWifiClient();
   }
@@ -91,16 +95,15 @@ void setup(void) {
   pinMode(GPIO12Relay, OUTPUT);
   digitalWrite(GPIO12Relay, HIGH);
 
-  mqttClient = PubSubClient(MQTT_SERVER, 1883, callback,wifiClient);
-  mqttClient.connect(tewifi->hostname.c_str(),"admin","<kitipasa>");
+  // ESTE mqttClient = PubSubClient(MQTT_SERVER, 1883, callback,wifiClient);
+  // ESTE mqttClient.connect(tewifi->hostname.c_str(),"admin","<kitipasa>");
   pinMode(GPIO00Button, INPUT_PULLUP);
 
   WebS = new TeWebServer(80);
 
-  tewifi->mdns.addService("http", "tcp", 80);
   // Start OTA server.
-  ArduinoOTA.setHostname((const char *)tewifi->hostname.c_str());
-  ArduinoOTA.begin();
+  // ESTE ArduinoOTA.setHostname((const char *)tewifi->hostname.c_str());
+  // ESTE ArduinoOTA.begin();
   blink(GPIO13Led, 600, 3);
 }
 
@@ -108,8 +111,7 @@ int seconds = millis() / 1000;
 char message_buff[100];
 
 void loop(void) {
-  tewifi->checkWifi();
-  tewifi->dnsServer.processNextRequest();
+ // tewifi->checkWifi();
   WebS->httpServer->handleClient();
   buttonStateOld = buttonState;
   pinMode(GPIO00Button, INPUT_PULLUP);
@@ -135,7 +137,7 @@ void loop(void) {
   if (sec2>seconds+10) {
     String pubString = "{\"report\":{\"light\": \"" + String(0) + "\"}}";
     pubString.toCharArray(message_buff, pubString.length()+1);
-    mqttClient.publish("arduino/lightsensor", message_buff);
+    // ESTE mqttClient.publish("arduino/lightsensor", message_buff);
     seconds=sec2;
   } 
   pinMode(GPIO03RX, INPUT_PULLUP);
