@@ -14,6 +14,13 @@
 #define max_variable 150  // Max variable length 
 const byte DNS_PORT = 53;
 
+WiFiClient wifiClient;
+PubSubClient mqttClient;
+
+Conf *configure;
+TeWifi *tewifi;
+
+TeWebServer *WebS;
 
 
 // ******************************************************************************************************
@@ -54,13 +61,67 @@ int filter(int input, int state, int dsec) {
   return true;
 }
 
-WiFiClient wifiClient;
-PubSubClient mqttClient;
+int gpioI[15]={HIGH,HIGH,HIGH,HIGH,HIGH,HIGH,HIGH,HIGH,HIGH,HIGH,HIGH,HIGH,HIGH,HIGH,HIGH};
+int gpioO[15]={LOW,LOW,LOW,LOW,LOW,LOW,LOW,LOW,LOW,LOW,LOW,LOW,LOW,LOW,LOW};
+int gpioP[15]={LOW,LOW,LOW,LOW,LOW,LOW,LOW,LOW,LOW,LOW,LOW,LOW,LOW,LOW,LOW};
 
-Conf *configure;
-TeWifi *tewifi;
+bool changeOUT(int gpioout) {
+   if (gpioO[gpioout]==LOW) 
+      changeOUT_ON(gpioout);
+   else 
+      changeOUT_OFF(gpioout);
+}
+bool changeOUT_ON(int gpioout) {
+         gpioO[gpioout]=HIGH;
+         pinMode(gpioout, OUTPUT);
+         digitalWrite(gpioout, HIGH);
+         if (configure->getVariable("gpio13")=="Relay") digitalWrite(GPIO13Led, LOW);
+         if (configure->getVariable("gpio13")=="Pulse") {
+            digitalWrite(GPIO13Led, LOW);
+            delay(500);
+            digitalWrite(GPIO13Led, HIGH);
+         }
+         return true;
+}
+bool changeOUT_OFF(int gpioout) {
+         gpioO[gpioout]=LOW;
+         pinMode(gpioout, OUTPUT);
+         digitalWrite(gpioout, LOW);
+         if (configure->getVariable("gpio13")=="Relay") digitalWrite(GPIO13Led, HIGH);
+         if (configure->getVariable("gpio13")=="Pulse") {
+            digitalWrite(GPIO13Led, LOW);
+            delay(500);
+            digitalWrite(GPIO13Led, HIGH);
+         }
+         return true;
+}
 
-TeWebServer *WebS;
+bool dealwithgpio(int gpioin,int gpioout) {
+   String gpiotxt=(gpioin<10?"gpio0":"gpio")+String(gpioin);
+   String modew=configure->getVariable(gpiotxt);
+   if (modew=="NU") return false;
+   if (modew=="IN-R") {
+     String modesw=configure->getVariable(gpiotxt+"sw");
+     if (modesw=="push") {
+       if (gpioP[gpioin]==LOW) {
+         if (filter(gpioin, LOW, 100)) {
+             changeOUT(gpioout);
+             gpioP[gpioin]=HIGH;
+         }
+       } else {  
+         if (filter(gpioin, HIGH, 300)) {
+             gpioP[gpioin]=LOW;
+         }
+       }
+     }
+     if (modesw=="switch") {
+       if (filter(gpioin, (gpioI[gpioin]==LOW?HIGH:LOW), 300)) {
+           gpioI[gpioin]= (gpioI[gpioin]==LOW?HIGH:LOW);
+           changeOUT(gpioout);
+       }
+     }
+   }
+}
 
 void setup(void) {
   configure = new Conf();
@@ -113,23 +174,11 @@ char message_buff[100];
 void loop(void) {
  // tewifi->checkWifi();
   WebS->httpServer->handleClient();
-  buttonStateOld = buttonState;
-  pinMode(GPIO00Button, INPUT_PULLUP);
-  buttonState = digitalRead(GPIO00Button);
-  if ( (buttonState != buttonStateOld) && (buttonStateOld == HIGH) ) {
-    pinMode(GPIO00Button, INPUT_PULLUP);
-    if (digitalRead(GPIO00Button) == LOW) {
-      if (filter(GPIO00Button, LOW, 50)) { //Check if button is HIGH for ~300ms
-        if (digitalRead(GPIO12Relay) == HIGH) {
-          digitalWrite(GPIO12Relay, LOW);
-          digitalWrite(GPIO13Led, HIGH);
-        } else {
-          digitalWrite(GPIO12Relay, HIGH);
-          digitalWrite(GPIO13Led, LOW);
-        }
-      }
-    }
-  }
+  dealwithgpio(GPIO00Button,GPIO12Relay);
+  dealwithgpio(GPIO14Pin,GPIO12Relay);
+  dealwithgpio(GPIO03RX,GPIO12Relay);
+  dealwithgpio(GPIO01TX,GPIO12Relay);
+
 //  Handle OTA server.
   ArduinoOTA.handle();
   yield();
@@ -140,18 +189,7 @@ void loop(void) {
     // ESTE mqttClient.publish("arduino/lightsensor", message_buff);
     seconds=sec2;
   } 
-  pinMode(GPIO03RX, INPUT_PULLUP);
-  if (filter(GPIO03RX, LOW, 150)) {
-    blink(GPIO13Led, 600, 3);
-  }
-  pinMode(GPIO01TX, INPUT_PULLUP);
-  if (filter(GPIO01TX, LOW, 150)) {
-    blink(GPIO13Led, 600, 3);
-  }
-  pinMode(GPIO14Pin, INPUT_PULLUP);
-  if (filter(GPIO14Pin, LOW, 150)) {
-    blink(GPIO13Led, 600, 3);
-  }
+ 
 }
 
 void callback(char* topic, byte* payload, unsigned int length) {

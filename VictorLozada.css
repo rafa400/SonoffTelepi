@@ -58,7 +58,7 @@ body{
   margin-left:34px;
   padding:5px 0;
 }
-#gpio14, #gpio01, #gpio03 {
+#gpio14, #gpio01, #gpio03, #gpio13 {
   padding:5px;
   outline:none;
   width:50px;

@@ -56,14 +56,12 @@ void TeWebServer::defineWeb() {
   });
   httpServer->on("/on", []() {
     WebS->httpServer->send(200, "text/html",  WebS->jsonPage + " [ { 'Relay1':'On' } ]}"  );
-    digitalWrite(GPIO13Led, LOW);
-    digitalWrite(GPIO12Relay, HIGH);
+    changeOUT_ON(GPIO12Relay);
     delay(100);
   });
   httpServer->on("/off", []() {
     WebS->httpServer->send(200, "text/html",  WebS->jsonPage + " [ { 'Relay1':'Off' } ]}"  );
-    digitalWrite(GPIO13Led, HIGH);
-    digitalWrite(GPIO12Relay, LOW);
+    changeOUT_OFF(GPIO12Relay);
     delay(100);
   });
   httpServer->on("/index.html", []() {
@@ -108,20 +106,27 @@ void TeWebServer::defineWeb() {
       WebS->gotoIndexHTML();
       return;
     }
+    CHECKEDdef("gpio00","IN","IN-R");
     String parameters[][2]={
+       {"%00a",SELECTEDdef("gpio13","Relay","Relay")},
+       {"%00b",SELECTED("gpio13","Pulse")},
+       {"%00c",SELECTED("gpio13","NU")},
        {"%01",CHECKEDdef("gpio00sw","switch","push")},
        {"%02",CHECKED("gpio00sw","push")},
        {"%03",SELECTEDdef("gpio14","IN","NU")},
+       {"%b3",SELECTED("gpio14","IN-R")},
        {"%04",SELECTED("gpio14","OUT")},
        {"%05",SELECTED("gpio14","NU")},
        {"%06",CHECKEDdef("gpio14sw","switch","switch")},
        {"%07",CHECKED("gpio14sw","push")},
        {"%08",SELECTEDdef("gpio01","IN","NU")},
+       {"%b8",SELECTED("gpio01","IN-R")},       
        {"%09",SELECTED("gpio01","OUT")},
        {"%10",SELECTED("gpio01","NU")},
        {"%11",CHECKEDdef("gpio01sw","switch","switch")},
        {"%12",CHECKED("gpio01sw","push")},
        {"%13",SELECTEDdef("gpio03","IN","NU")},
+       {"%b13",SELECTED("gpio03","IN-R")},              
        {"%14",SELECTED("gpio03","OUT")},
        {"%15",SELECTED("gpio03","NU")},
        {"%16",CHECKEDdef("gpio03sw","switch","switch")},
