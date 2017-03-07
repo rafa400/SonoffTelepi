@@ -65,6 +65,20 @@ int gpioI[15]={HIGH,HIGH,HIGH,HIGH,HIGH,HIGH,HIGH,HIGH,HIGH,HIGH,HIGH,HIGH,HIGH,
 int gpioO[15]={LOW,LOW,LOW,LOW,LOW,LOW,LOW,LOW,LOW,LOW,LOW,LOW,LOW,LOW,LOW};
 int gpioP[15]={LOW,LOW,LOW,LOW,LOW,LOW,LOW,LOW,LOW,LOW,LOW,LOW,LOW,LOW,LOW};
 
+
+char message_buff[100];
+char topic_buff[100];
+void mqttmessage(int gpioout) {
+    String pubString = "{\"report\":{\"light\": \"" + String(gpioO[gpioout]) + "\"}}";
+    pubString.toCharArray(message_buff, pubString.length()+1);
+    String topicString = "telepi/lightsensor/"+configure->getVariable("hostname")+"/"+String(gpioout);
+    topicString.toCharArray(topic_buff, topicString.length()+1);
+    if (mqttClient.publish(topic_buff, message_buff)==false) {
+//        mqttClient = PubSubClient(MQTT_SERVER, 1883, callback,wifiClient);
+        mqttClient.connect(tewifi->hostname.c_str(),"admin","<kitipasa>");
+    }
+}
+
 bool changeOUT(int gpioout) {
    if (gpioO[gpioout]==LOW) 
       changeOUT_ON(gpioout);
@@ -75,6 +89,7 @@ bool changeOUT_ON(int gpioout) {
          gpioO[gpioout]=HIGH;
          pinMode(gpioout, OUTPUT);
          digitalWrite(gpioout, HIGH);
+         mqttmessage(gpioout);
          if (configure->getVariable("gpio13")=="Relay") digitalWrite(GPIO13Led, LOW);
          if (configure->getVariable("gpio13")=="Pulse") {
             digitalWrite(GPIO13Led, LOW);
@@ -87,6 +102,7 @@ bool changeOUT_OFF(int gpioout) {
          gpioO[gpioout]=LOW;
          pinMode(gpioout, OUTPUT);
          digitalWrite(gpioout, LOW);
+         mqttmessage(gpioout);
          if (configure->getVariable("gpio13")=="Relay") digitalWrite(GPIO13Led, HIGH);
          if (configure->getVariable("gpio13")=="Pulse") {
             digitalWrite(GPIO13Led, LOW);
@@ -156,20 +172,17 @@ void setup(void) {
   pinMode(GPIO12Relay, OUTPUT);
   digitalWrite(GPIO12Relay, HIGH);
 
-  // ESTE mqttClient = PubSubClient(MQTT_SERVER, 1883, callback,wifiClient);
-  // ESTE mqttClient.connect(tewifi->hostname.c_str(),"admin","<kitipasa>");
   pinMode(GPIO00Button, INPUT_PULLUP);
 
   WebS = new TeWebServer(80);
 
   // Start OTA server.
-  // ESTE ArduinoOTA.setHostname((const char *)tewifi->hostname.c_str());
-  // ESTE ArduinoOTA.begin();
+  ArduinoOTA.setHostname((const char *)tewifi->hostname.c_str());
+  ArduinoOTA.begin();
   blink(GPIO13Led, 600, 3);
+  mqttClient = PubSubClient(MQTT_SERVER, 1883, callback,wifiClient);
+  mqttClient.connect(tewifi->hostname.c_str(),"admin","<kitipasa>");
 }
-
-int seconds = millis() / 1000;
-char message_buff[100];
 
 void loop(void) {
  // tewifi->checkWifi();
@@ -182,14 +195,7 @@ void loop(void) {
 //  Handle OTA server.
   ArduinoOTA.handle();
   yield();
-  int sec2=millis()/1000;
-  if (sec2>seconds+10) {
-    String pubString = "{\"report\":{\"light\": \"" + String(0) + "\"}}";
-    pubString.toCharArray(message_buff, pubString.length()+1);
-    // ESTE mqttClient.publish("arduino/lightsensor", message_buff);
-    seconds=sec2;
-  } 
- 
+
 }
 
 void callback(char* topic, byte* payload, unsigned int length) {
