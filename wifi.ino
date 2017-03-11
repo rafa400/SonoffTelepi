@@ -51,12 +51,16 @@ bool TeWifi::modeDefaultWifiAP() {
   return true;
 }
 bool TeWifi::modeWifiClient() {
-  if (configure->getVariable("dhcp") == "FIXIP")
-    WiFi.config(  TeWifi::parseIP(configure->getVariable("Wifi_IP")),TeWifi::parseIP(configure->getVariable("Wifi_DNS")), TeWifi::parseIP(configure->getVariable("Wifi_GW")), TeWifi::parseIP(configure->getVariable("Wifi_MSK")) );
   WiFi.begin(configure->getVariable("wifiSSID").c_str(), configure->getVariable("wifipassword").c_str());
+  if (configure->getVariable("dhcp") == "FIXIP") {
+    WiFi.config(  TeWifi::parseIP(configure->getVariable("Wifi_IP")),TeWifi::parseIP(configure->getVariable("Wifi_DNS")), TeWifi::parseIP(configure->getVariable("Wifi_GW")), TeWifi::parseIP(configure->getVariable("Wifi_MSK")) );
+  }
   int i=0;
   while  ((WiFi.status() != WL_CONNECTED) && (i<20)) {
     delay(500); i++;
+  }
+  if (configure->getVariable("dhcp") == "FIXIP") {
+    WiFi.config(  TeWifi::parseIP(configure->getVariable("Wifi_IP")),TeWifi::parseIP(configure->getVariable("Wifi_DNS")), TeWifi::parseIP(configure->getVariable("Wifi_GW")), TeWifi::parseIP(configure->getVariable("Wifi_MSK")) );
   }
   return true;
 }
