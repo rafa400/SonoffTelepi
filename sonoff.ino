@@ -3,6 +3,8 @@
 #include "config.h"
 #include "wifi.h"
 #include "webserver.h"
+#include <DNSServer.h>
+#include <ESP8266mDNS.h>
 
 /**
    @brief mDNS and OTA Constants
@@ -145,6 +147,11 @@ bool dealwithgpio(int gpioin,int gpioout) {
    }
 }
 
+#define APDEFAULT 0
+#define APFIXED 1
+#define APSMARTCONF 2
+int bootmode=APDEFAULT;
+
 void setup(void) {
   configure = new Conf();
   // configure->reset();
@@ -158,21 +165,25 @@ void setup(void) {
     blink(GPIO13Led, 500, 8);
     if (filter(GPIO00Button, LOW, 700)) { //Check if button is HIGH for ~700ms
       blink(GPIO13Led, 250, 16);
-      WiFi.mode(WIFI_AP_STA);
-      delay(500);
+//      configure->reset();
+      tewifi->modeDefaultWifiAP();
+      bootmode=APFIXED;
+    } else {
+      //WiFi.mode(WIFI_AP_STA);
+      //delay(500);
       WiFi.beginSmartConfig();
+      bootmode=APSMARTCONF;
       while(1){
          delay(1000);
          if(WiFi.smartConfigDone()){
-            Serial.println("SmartConfig Success");
+            //Serial.println("SmartConfig Success");
             break;
          }
       }
     }
-    configure->reset();
-    tewifi->modeDefaultWifiAP();
   } else {
     tewifi->modeWifiClient();
+    bootmode=APDEFAULT;
   }
 
   pinMode(GPIO12Relay, OUTPUT);
@@ -186,12 +197,19 @@ void setup(void) {
   ArduinoOTA.setHostname((const char *)tewifi->hostname.c_str());
   ArduinoOTA.begin();
   blink(GPIO13Led, 600, 3);
-  mqttClient = PubSubClient(MQTT_SERVER, 1883, callback,wifiClient);
-  mqttClient.connect(tewifi->hostname.c_str(),"admin","<kitipasa>");
-  String subscribeme="telepi/Relay/OUT/"+configure->getVariable("hostname")+"/#";
-  mqttClient.subscribe(subscribeme.c_str());
-  subscribeme="telepi/Relay/"+configure->getVariable("hostname")+"/#";
-  mqttClient.subscribe(subscribeme.c_str());
+  if ( bootmode==APDEFAULT) {
+    mqttClient = PubSubClient(MQTT_SERVER, 1883, callback,wifiClient);
+    mqttClient.connect(tewifi->hostname.c_str(),"admin","<kitipasa>");
+    String subscribeme="telepi/Relay/OUT/"+configure->getVariable("hostname")+"/#";
+    mqttClient.subscribe(subscribeme.c_str());
+    subscribeme="telepi/Relay/"+configure->getVariable("hostname")+"/#";
+    mqttClient.subscribe(subscribeme.c_str());
+    subscribeme="telepi/Relay/"+configure->getVariable("hostname")+"/#";
+    subscribeme = "telepi/DEBUG/"+configure->getVariable("hostname")+"/BootIP";
+    IPAddress ip=WiFi.localIP();
+    String myip=String(ip[0])+"."+String(ip[1])+"."+String(ip[2])+"."+String(ip[3]);
+    mqttClient.publish(subscribeme.c_str(), myip.c_str());
+  }
 }
 
 void loop(void) {
@@ -202,7 +220,8 @@ void loop(void) {
   dealwithgpio(GPIO03RX,GPIO12Relay);
   dealwithgpio(GPIO01TX,GPIO12Relay);
 
-  mqttClient.loop();
+  if ( bootmode==APDEFAULT) mqttClient.loop(); 
+//  else dnsServer.processNextRequest();
 //  Handle OTA server.
   ArduinoOTA.handle();
   yield();

@@ -1,5 +1,6 @@
 #include "webserver.h"
 
+
 TeWebServer::TeWebServer() {
   TeWebServer(80);
 }
@@ -44,8 +45,8 @@ boolean TeWebServer::authenticate() {
 }
 
 void  TeWebServer::gotoIndexHTML() {
-  String indexhtml("<meta http-equiv=\"refresh\" content=\"0; url=/index.html\" />");
-  WebS->httpServer->send(200, "text/html", indexhtml );    
+  String index2("<meta http-equiv=\"refresh\" content=\"0; url=/index.html\" />");
+  WebS->httpServer->send(200, "text/html", index2 );    
 }
 
 
@@ -96,9 +97,9 @@ void TeWebServer::defineWeb() {
        {"%6s",configure->getVariable("Wifi_DNS")},
        {"%time",String(hr)+":"+String(min)+":"+String(sec)}
     };
-    String wifisetup=wifisetuphtml;
+    String wifisetup=String(wifisetuphtml);
     for(int i=0;i<sizeof(parameters)/sizeof(parameters[0]);i++) wifisetup.replace(parameters[i][0],parameters[i][1]);
-    WebS->httpServer->send(200, "text/html",htmlhead+wifisetup+htmltail);
+    WebS->httpServer->send(200, "text/html",String(htmlhead)+wifisetup+String(htmltail));
     delay(100);
   });
   httpServer->on("/workmode.html", []() {
@@ -132,9 +133,9 @@ void TeWebServer::defineWeb() {
        {"%16",CHECKEDdef("gpio03sw","switch","switch")},
        {"%17",CHECKED("gpio03sw","push")},
     };    
-    String workmode=workmodehtml;
+    String workmode=String(workmodehtml);
     for(int i=0;i<sizeof(parameters)/sizeof(parameters[0]);i++) workmode.replace(parameters[i][0],parameters[i][1]);
-    WebS->httpServer->send(200, "text/html", htmlhead+workmode+htmltail );
+    WebS->httpServer->send(200, "text/html", String(htmlhead)+workmode+String(htmltail) );
     delay(100);
   });
   httpServer->on("/mqtt.html", []() {
@@ -177,13 +178,11 @@ void TeWebServer::defineWeb() {
     delay(100);
     ESP.reset();
   });  
+  httpServer->on("/reset", []() {
+    ESP.reset();
+  });  
   httpServer->on("/cero", []() {
-    free(&VictorLozada);
-    free(&htmlhead);
-    free(&htmltail); 
 //    free(&indexhtml);
-    free(&wifisetuphtml);
-    free(&workmodehtml);
     WebS->httpServer->send(200, "text/html", "CLEAR MADE" );
     delay(100);
   });  
@@ -194,7 +193,7 @@ void TeWebServer::defineWeb() {
   });
   
   httpServer->onNotFound( []() {
-    WebS->httpServer->send(200, "text/html", indexhtml );
+    WebS->httpServer->send(200, "text/html", String(indexhtml));
     delay(100);
   });
 }

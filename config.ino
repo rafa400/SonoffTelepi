@@ -55,7 +55,7 @@ void Conf::addConfig(String varname, String varval) {
 }
 String Conf::getFirstVar(String *text, String separator) {
   int8_t pos = text->indexOf(separator);
-  if (pos == -1) {String first=*text; return ("");}
+  if (pos == -1) {String first=*text;*text=""; return (first);}
   String first = text->substring(0, pos);
   *text = text->substring(pos + 1);
   text->trim();
