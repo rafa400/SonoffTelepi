@@ -44,12 +44,21 @@ bool TeWifi::modeDefaultWifiAP() {
   WiFi.mode(WIFI_AP);
   WiFi.softAPConfig( TeWifi::parseIP("192.168.0.1"), TeWifi::parseIP("192.168.0.1"), TeWifi::parseIP("255.255.255.0") );
   WiFi.softAP("TelePiSonoff", "kitipasa" );
-  if (!WiFi.softAP("TelePiSonoff", "kitipasa" )) {
-    return false;
-  }
-  WiFi.softAPConfig( TeWifi::parseIP("192.168.0.1"), TeWifi::parseIP("192.168.0.1"), TeWifi::parseIP("255.255.255.0") );  
-  dnsServer.start(DNS_PORT, "*", TeWifi::parseIP("192.168.0.1"));
+  dnsServer= new DNSServer;
+  dnsServer->start(DNS_PORT, "*", TeWifi::parseIP("192.168.0.1"));
   return true;
+}
+bool TeWifi::modeAutoWifiAP() {
+  dnsServer= new DNSServer;
+  WiFi.beginSmartConfig();
+  while(1){
+     delay(1000);
+     if(WiFi.smartConfigDone()){
+        //Serial.println("SmartConfig Success");
+         return true;
+     }
+  }
+  return false;
 }
 bool TeWifi::modeWifiClient() {
   if (configure->getVariable("dhcp") == "FIXIP") {

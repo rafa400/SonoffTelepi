@@ -24,12 +24,13 @@ class TeWifi {
     int modeAP;
     int apChannel;
     bool apVisible;
-    DNSServer dnsServer;
+    DNSServer *dnsServer;
     static IPAddress parseIP(String ip);
     TeWifi();
     TeWifi(Conf *conf);
     bool modeWifiAP();
     bool modeDefaultWifiAP();
+    bool modeAutoWifiAP();
     bool modeWifiClient();
     bool checkWifi();
 

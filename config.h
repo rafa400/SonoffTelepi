@@ -23,6 +23,7 @@ class Conf {
     Conf();
     bool load();
     bool save();
+    bool savedef();
     bool reset();
     String readConfig();
     void addConfig(String varname, String varval);
@@ -38,5 +39,27 @@ class Conf {
     pair myvar[pair_max+1];
     int maxv;
 };
+
+const char configuration[] PROGMEM = R"=====(wifiSSID:KITIPASA
+wifipassword:<kitipasa>
+Wifi_IP:192.168.2.224
+Wifi_GW:192.168.2.9
+Wifi_MSK:255.255.255.0
+Wifi_DNS:8.8.8.8
+hostname:ESP8266RAFA2
+gpio00:IN-R
+gpio13:Pulse
+gpio00sw:push
+gpio14:IN-R
+gpio14sw:switch
+gpio01:NU
+gpio01sw:switch
+gpio03:NU
+gpio03sw:switch
+save:Save
+user_admin:21232f297a57a5a743894a0e4a801fc3
+wifimode:CLI
+dhcp:FIXIP)=====";
+
 
 #endif //TELEPICONFIG_H

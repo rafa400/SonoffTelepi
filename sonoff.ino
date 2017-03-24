@@ -154,7 +154,6 @@ int bootmode=APDEFAULT;
 
 void setup(void) {
   configure = new Conf();
-  // configure->reset();
   tewifi = new TeWifi(configure);
 
   pinMode(GPIO13Led, OUTPUT);

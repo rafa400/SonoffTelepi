@@ -7,6 +7,7 @@ Conf::Conf() {
 }
 bool Conf::load() {
   SPIFFS.begin();
+  //reset();
   File configFile = SPIFFS.open("/config.txt", "r");
   maxv=0;
   int n1,n2;
@@ -34,6 +35,17 @@ bool Conf::save() {
   SPIFFS.end();
   return true;
 }
+
+bool Conf::savedef() {
+  SPIFFS.begin();
+  File configFile = SPIFFS.open("/config.txt", "w");
+  if (!configFile) return false;
+  configFile.print(String(configuration));
+  configFile.close();
+  SPIFFS.end();
+  return true;
+}
+
 bool Conf::reset() {
   maxv=0;
   save();

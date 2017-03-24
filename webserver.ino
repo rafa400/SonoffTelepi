@@ -6,14 +6,25 @@ TeWebServer::TeWebServer() {
 }
 
 TeWebServer::TeWebServer(int port) {
-  mdns = new MDNSResponder; //ESP8266mDNS;
-  mdns->begin("esp8266", WiFi.localIP());
+  //mdns = new MDNSResponder; //ESP8266mDNS;
+  //mdns->begin("esp8266", WiFi.localIP());
   //co=NULL;
   jsonPage = "{ 'status':'success', 'count': 1, 'type':'Sonoff TelePi', 'time':'', 'hostname':'OpenWrt2', 'results':";
   httpServer = new ESP8266WebServer(port);
-  httpUpdater = new ESP8266HTTPUpdateServer;
-  mdns->addService("http", "tcp", 80); 
-  defineWeb();
+  //mdns->addService("http", "tcp", 80); 
+//  if (bootmode==TPAPDEFAULT) {
+    httpUpdater = new ESP8266HTTPUpdateServer;
+    defineWeb();
+/*  } else {
+    httpServer->onNotFound([]() {
+    String responseHTML = ""
+  "<!DOCTYPE html><html><head><title>CaptivePortal</title></head><body>"
+  "<h1>Hello World!</h1><p>This is a captive portal example. All requests will "
+  "be redirected here.</p></body></html>";
+       WebS->httpServer->send(200, "text/html", responseHTML);
+    });
+  }*/
+  
   httpUpdater->setup(httpServer);
   
   startAllServices();
@@ -27,11 +38,11 @@ bool TeWebServer::startAllServices() {
   // mdns->notifyAPChange();
   //mdns->update();
   httpServer->begin();
-  mdns->addService("http", "tcp", 80);  
+  //mdns->addService("http", "tcp", 80);  
 }
 bool TeWebServer::stopAllServices() {
   // mdns->notifyAPChange();
-  mdns->update();
+  //mdns->update();
   httpServer->stop();
 }
 
@@ -69,6 +80,7 @@ void TeWebServer::defineWeb() {
     WebS->httpServer->send(200, "text/html", indexhtml );
     delay(100);
   });
+  
   httpServer->on("/wifisetup.html", []() {
     if ( ! configure->setArgs(*WebS->httpServer) ) {
       WebS->gotoIndexHTML();
@@ -139,21 +151,8 @@ void TeWebServer::defineWeb() {
     delay(100);
   });
   httpServer->on("/mqtt.html", []() {
-   EthernetClient client;
-    String mqtt="";
-   if (client.connect("192.168.2.12", 80)) {
-    Serial.println("connected");
-    // Make a HTTP request:
-    client.println("GET /caca.html HTTP/1.1");
-    client.println("Host: 192.168.2.12");
-    client.println("Connection: close");
-    client.println();
-    while (client.available()) {
-       char mqtt=mqtt+client.read();
-    }
-    if (!client.connected()) client.stop();
-   }
-    WebS->httpServer->send(200, "text/html", mqtt );
+    String mqtt=String(mqttconfhtml);
+    WebS->httpServer->send(200, "text/html",  String(htmlhead)+mqtt+String(htmltail) );
     delay(100);
   });
 
@@ -193,7 +192,7 @@ void TeWebServer::defineWeb() {
   });
   
   httpServer->onNotFound( []() {
-    WebS->httpServer->send(200, "text/html", String(indexhtml));
+    WebS->httpServer->send(200, "text/html", indexhtml);
     delay(100);
   });
 }
