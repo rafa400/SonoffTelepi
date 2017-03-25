@@ -193,7 +193,7 @@ void TeWebServer::defineWeb() {
   });
   
   httpServer->onNotFound( []() {
-    WebS->httpServer->send(200, "text/html", String(indexhtml));
+    WebS->httpServer->send(200, "text/html", indexhtml);
     delay(100);
   });
 }
