@@ -6,8 +6,9 @@ Conf::Conf() {
   load();
 }
 bool Conf::load() {
+  savedef();
   SPIFFS.begin();
-  File configFile = SPIFFS.open("/config.txt", "r");
+  File configFile = SPIFFS.open("/config1.txt", "r");
   maxv=0;
   int n1,n2;
   if (!configFile) return false;
@@ -24,7 +25,7 @@ bool Conf::load() {
 }
 bool Conf::save() {
   SPIFFS.begin();
-  File configFile = SPIFFS.open("/config.txt", "w");
+  File configFile = SPIFFS.open("/config1.txt", "w");
   if (!configFile) return false;
   for(int i=0;i<maxv;i++) {
     configFile.print(String(myvar[i].variable)+":");
@@ -34,13 +35,39 @@ bool Conf::save() {
   SPIFFS.end();
   return true;
 }
+
+bool Conf::savedef() {
+  maxv=0;
+  getVariable("hostname",HOSTNAME + String(ESP.getChipId(), HEX));
+  getVariable("wifiSSID","KITIPASA");
+  getVariable("wifipassword","<kitipasa>");
+  getVariable("Wifi_IP","192.168.0.20");
+  getVariable("Wifi_GW","192.168.0.1");
+  getVariable("Wifi_MSK","255.255.255.0");
+  getVariable("Wifi_DNS","8.8.8.8");
+  getVariable("user_admin","21232f297a57a5a743894a0e4a801fc3");
+  getVariable("wifimode","CLI");
+  getVariable("dhcp","DHCP");
+  getVariable("gpio00","IN-R");
+  getVariable("gpio13","Pulse");
+  getVariable("gpio00sw","push");
+  getVariable("gpio14","IN-R");
+  getVariable("gpio14sw","switch");
+  getVariable("gpio01","NU");
+  getVariable("gpio01sw","switch");
+  getVariable("gpio03","NU");
+  getVariable("gpio03sw","switch");
+  save();
+  return true;
+}
+
 bool Conf::reset() {
   maxv=0;
   save();
 }
 String Conf::readConfig() {
   SPIFFS.begin();
-  File configFile = SPIFFS.open("/config.txt", "r");
+  File configFile = SPIFFS.open("/config1.txt", "r");
   String content = "EMPTY!";
   if (configFile) content = configFile.readString();
   configFile.close();
@@ -53,12 +80,12 @@ void Conf::addConfig(String varname, String varval) {
   strcpy(myvar[maxv].value,varval.c_str());
   maxv++;
 }
-String Conf::getFirstVar(String *text, String separator) {
-  int8_t pos = text->indexOf(separator);
-  if (pos == -1) {String first=*text;*text=""; return (first);}
-  String first = text->substring(0, pos);
-  *text = text->substring(pos + 1);
-  text->trim();
+String Conf::getFirstVar(String &text, String separator) {
+  int8_t pos = text.indexOf(separator);
+  if (pos == -1) {String first=text;text=""; return (first);}
+  String first = text.substring(0, pos);
+  text = text.substring(pos + 1);
+  text.trim();
   first.trim();
   return first;
 }

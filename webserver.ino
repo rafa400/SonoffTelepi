@@ -66,7 +66,7 @@ void TeWebServer::defineWeb() {
     delay(100);
   });
   httpServer->on("/index.html", []() {
-    WebS->httpServer->send(200, "text/html", indexhtml );
+    WebS->httpServer->send(200, "text/html", FPSTR(indexhtml) );
     delay(100);
   });
   httpServer->on("/wifisetup.html", []() {
@@ -97,9 +97,11 @@ void TeWebServer::defineWeb() {
        {"%6s",configure->getVariable("Wifi_DNS")},
        {"%time",String(hr)+":"+String(min)+":"+String(sec)}
     };
-    String wifisetup=String(wifisetuphtml);
+    String wifisetup=FPSTR(wifisetuphtml);
+    String htmlhead1=FPSTR(htmlhead);
+    String htmltail1=FPSTR(htmltail);
     for(int i=0;i<sizeof(parameters)/sizeof(parameters[0]);i++) wifisetup.replace(parameters[i][0],parameters[i][1]);
-    WebS->httpServer->send(200, "text/html",String(htmlhead)+wifisetup+String(htmltail));
+    WebS->httpServer->send(200, "text/html",htmlhead1+wifisetup+htmltail1);
     delay(100);
   });
   httpServer->on("/workmode.html", []() {
@@ -133,9 +135,11 @@ void TeWebServer::defineWeb() {
        {"%16",CHECKEDdef("gpio03sw","switch","switch")},
        {"%17",CHECKED("gpio03sw","push")},
     };    
-    String workmode=String(workmodehtml);
+    String workmode=FPSTR(workmodehtml);
+    String htmlhead1=FPSTR(htmlhead);
+    String htmltail1=FPSTR(htmltail);
     for(int i=0;i<sizeof(parameters)/sizeof(parameters[0]);i++) workmode.replace(parameters[i][0],parameters[i][1]);
-    WebS->httpServer->send(200, "text/html", String(htmlhead)+workmode+String(htmltail) );
+    WebS->httpServer->send(200, "text/html", htmlhead1+workmode+htmltail1 );
     delay(100);
   });
   httpServer->on("/mqtt.html", []() {
@@ -165,7 +169,7 @@ void TeWebServer::defineWeb() {
 */
 
   httpServer->on("/VictorLozada.css", []() {
-    WebS->httpServer->send(200, "text/css", VictorLozada );
+    WebS->httpServer->send(200, "text/css", FPSTR(VictorLozada) );
     delay(100);
   });
   httpServer->on("/config.txt", []() {
@@ -193,7 +197,7 @@ void TeWebServer::defineWeb() {
   });
   
   httpServer->onNotFound( []() {
-    WebS->httpServer->send(200, "text/html", indexhtml);
+    WebS->httpServer->send(200, "text/html", FPSTR(indexhtml));
     delay(100);
   });
 }

@@ -5,13 +5,6 @@
 #include "wifi.h"
 
 TeWifi::TeWifi(void) {
-  configure->getVariable("wifiSSID","KITIPASA");
-  configure->getVariable("wifipassword","<kitipasa>");
-  configure->getVariable("Wifi_IP","192.168.0.20");
-  configure->getVariable("Wifi_GW","192.168.0.1");
-  configure->getVariable("Wifi_MSK","255.255.255.0");
-  configure->getVariable("Wifi_DNS","8.8.8.8");
-  
   // Set Hostname.
   def_hostname = HOSTNAME + String(ESP.getChipId(), HEX);
   hostname =  configure->getVariable("hostname", def_hostname );
@@ -25,10 +18,10 @@ TeWifi::TeWifi(Conf *conf) {
   apVisible = true;
 }
 IPAddress TeWifi::parseIP(String ip) {
-  int a1 = Conf::getFirstVar(&ip, ".").toInt();
-  int a2 = Conf::getFirstVar(&ip, ".").toInt();
-  int a3 = Conf::getFirstVar(&ip, ".").toInt();
-  int a4 = Conf::getFirstVar(&ip, ".").toInt();
+  int a1 = Conf::getFirstVar(ip, ".").toInt();
+  int a2 = Conf::getFirstVar(ip, ".").toInt();
+  int a3 = Conf::getFirstVar(ip, ".").toInt();
+  int a4 = Conf::getFirstVar(ip, ".").toInt();
   return IPAddress(a1, a2, a3, a4);
 }
 bool TeWifi::modeWifiAP() {

@@ -43,9 +43,9 @@ int buttonStateOld = HIGH;
 void blink(int gpionum, int one, int num) {
   int state = digitalRead(gpionum);
   for (int i = 0; i < num; i++) {
-    digitalWrite(gpionum, LOW);
-    delay(one / 2);
     digitalWrite(gpionum, HIGH);
+    delay(one / 2);
+    digitalWrite(gpionum, LOW);
     delay(one / 2);
   }
   digitalWrite(gpionum, state);
@@ -71,6 +71,7 @@ int gpioP[15]={LOW,LOW,LOW,LOW,LOW,LOW,LOW,LOW,LOW,LOW,LOW,LOW,LOW,LOW,LOW};
 char message_buff[100];
 char topic_buff[100];
 void mqttmessage(int gpio,int value,String mytype) {
+    return;
     String pubString = "{\"report\":{\"light\": \"" + String(value) + "\"}}";
 //    pubString.toCharArray(message_buff, pubString.length()+1);
     String topicString = "telepi/"+mytype+"/"+configure->getVariable("hostname")+"/"+String(gpio);
@@ -94,9 +95,9 @@ bool changeOUT_ON(int gpioout) {
          mqttmessage(gpioout,gpioO[gpioout],"Relay");
          if (configure->getVariable("gpio13")=="Relay") digitalWrite(GPIO13Led, LOW);
          if (configure->getVariable("gpio13")=="Pulse") {
-            digitalWrite(GPIO13Led, LOW);
-            delay(500);
             digitalWrite(GPIO13Led, HIGH);
+            delay(500);
+            digitalWrite(GPIO13Led, LOW);
          }
          return true;
 }
@@ -107,9 +108,9 @@ bool changeOUT_OFF(int gpioout) {
          mqttmessage(gpioout,gpioO[gpioout],"Relay");
          if (configure->getVariable("gpio13")=="Relay") digitalWrite(GPIO13Led, HIGH);
          if (configure->getVariable("gpio13")=="Pulse") {
-            digitalWrite(GPIO13Led, LOW);
-            delay(500);
             digitalWrite(GPIO13Led, HIGH);
+            delay(500);
+            digitalWrite(GPIO13Led, LOW);
          }
          return true;
 }
@@ -153,13 +154,12 @@ bool dealwithgpio(int gpioin,int gpioout) {
 int bootmode=APDEFAULT;
 
 void setup(void) {
-  configure = new Conf();
-  // configure->reset();
-  tewifi = new TeWifi(configure);
-
   pinMode(GPIO13Led, OUTPUT);
-  digitalWrite(GPIO13Led, LOW);
-  blink(GPIO13Led, 300, 6);
+  blink(GPIO13Led, 300, 2);
+  configure = new Conf();
+  blink(GPIO13Led, 300, 2);
+  tewifi = new TeWifi(configure);
+  blink(GPIO13Led, 300, 2);
   // Go to Config on boot
   if (filter(GPIO00Button, LOW, 700)) { //Check if button is HIGH for ~700ms
     blink(GPIO13Led, 500, 8);
@@ -197,6 +197,7 @@ void setup(void) {
   ArduinoOTA.setHostname((const char *)tewifi->hostname.c_str());
   ArduinoOTA.begin();
   blink(GPIO13Led, 600, 3);
+/*  
   if ( bootmode==APDEFAULT) {
     mqttClient = PubSubClient(MQTT_SERVER, 1883, callback,wifiClient);
     mqttClient.connect(tewifi->hostname.c_str(),"admin","<kitipasa>");
@@ -210,20 +211,22 @@ void setup(void) {
     String myip=String(ip[0])+"."+String(ip[1])+"."+String(ip[2])+"."+String(ip[3]);
     mqttClient.publish(subscribeme.c_str(), myip.c_str());
   }
+  */
 }
 
 void loop(void) {
  // tewifi->checkWifi();
   WebS->httpServer->handleClient();
+  blink(GPIO13Led, 250, 3);
   dealwithgpio(GPIO00Button,GPIO12Relay);
   dealwithgpio(GPIO14Pin,GPIO12Relay);
   dealwithgpio(GPIO03RX,GPIO12Relay);
   dealwithgpio(GPIO01TX,GPIO12Relay);
 
-  if ( bootmode==APDEFAULT) mqttClient.loop(); 
+//  if ( bootmode==APDEFAULT) mqttClient.loop(); 
 //  else dnsServer.processNextRequest();
-//  Handle OTA server.
-  ArduinoOTA.handle();
+
+  ArduinoOTA.handle(); //  Handle OTA server.
   yield();
 
 }

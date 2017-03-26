@@ -23,6 +23,7 @@ class Conf {
     Conf();
     bool load();
     bool save();
+    bool savedef();
     bool reset();
     String readConfig();
     void addConfig(String varname, String varval);
@@ -32,7 +33,7 @@ class Conf {
     bool checkUserPassword(String user,String password);
     bool checkUserMD5Password(String user,String password);
     void setUserPassword(String user,String password);
-    static String getFirstVar(String *text, String separator);
+    static String getFirstVar(String &text, String separator);
     bool setArgs(ESP8266WebServer &WebServer);
   private:
     pair myvar[pair_max+1];
