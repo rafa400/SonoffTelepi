@@ -6,7 +6,7 @@ Conf::Conf() {
   load();
 }
 bool Conf::load() {
-  savedef();
+  // savedef();
   SPIFFS.begin();
   File configFile = SPIFFS.open("/config1.txt", "r");
   maxv=0;

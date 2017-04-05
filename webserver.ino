@@ -95,7 +95,8 @@ void TeWebServer::defineWeb() {
        {"%4s",configure->getVariable("Wifi_GW")},
        {"%5s",configure->getVariable("Wifi_MSK")},
        {"%6s",configure->getVariable("Wifi_DNS")},
-       {"%time",String(hr)+":"+String(min)+":"+String(sec)}
+       {"%time",String(hr)+":"+String(min)+":"+String(sec)},
+       {"%eso",TelePiVersion}
     };
     String wifisetup=FPSTR(wifisetuphtml);
     String htmlhead1=FPSTR(htmlhead);
@@ -177,7 +178,7 @@ void TeWebServer::defineWeb() {
     delay(100);
   });
   httpServer->on("/resetconfig", []() {
-    configure->reset();
+    configure->savedef();
     WebS->gotoIndexHTML();
     delay(100);
     ESP.reset();
