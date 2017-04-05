@@ -10,7 +10,7 @@
    @brief mDNS and OTA Constants
    @{
 */
-#define TelePiVersion "Ver: 1.1"
+#define TelePiVersion "Ver: 1.2"
 #define MQTT_SERVER "192.168.2.9"  // My mosquitto server
 /// @}
 
@@ -127,12 +127,12 @@ bool dealwithgpio(int gpioin,int gpioout) {
          if (filter(gpioin, LOW, 50)) {
              if (modew=="IN-R") changeOUT(gpioout);
              gpioP[gpioin]=HIGH;
-             mqttmessage(gpioin,gpioI[gpioin],"in");
+             mqttmessage(gpioin,gpioP[gpioin],"in");
          }
        } else {  
          if (filter(gpioin, HIGH, 100)) {
              gpioP[gpioin]=LOW;
-             mqttmessage(gpioin,gpioI[gpioin],"in");
+             mqttmessage(gpioin,gpioP[gpioin],"in");
          }
        }
      }
@@ -197,20 +197,18 @@ void setup(void) {
   // Start OTA server.
   ArduinoOTA.setHostname((const char *)tewifi->hostname.c_str());
   ArduinoOTA.begin();
- // blink(GPIO13Led, 600, 3);
+  blink(GPIO13Led, 600, 3);
   
   if ( bootmode==APDEFAULT) {
     mqttClient = PubSubClient(MQTT_SERVER, 1883, callback,wifiClient);
     mqttClient.connect(tewifi->hostname.c_str(),"admin","<kitipasa>");
-    String subscribeme="telepi/Relay/OUT/"+configure->getVariable("hostname")+"/#";
-    mqttClient.subscribe(subscribeme.c_str());
-    subscribeme="telepi/Relay/"+configure->getVariable("hostname")+"/#";
-    mqttClient.subscribe(subscribeme.c_str());
-    subscribeme="telepi/Relay/"+configure->getVariable("hostname")+"/#";
-    subscribeme = "telepi/DEBUG/"+configure->getVariable("hostname")+"/BootIP";
+    String subscribeme="telepi/DEBUG/"+configure->getVariable("hostname")+"/BootIP";
     IPAddress ip=WiFi.localIP();
     String myip=String(ip[0])+"."+String(ip[1])+"."+String(ip[2])+"."+String(ip[3]);
     mqttClient.publish(subscribeme.c_str(), myip.c_str());
+    
+    subscribeme="telepi/Relay/OUT/"+configure->getVariable("hostname")+"/#";
+    mqttClient.subscribe(subscribeme.c_str());
   }
   
 }

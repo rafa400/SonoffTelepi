@@ -144,21 +144,18 @@ void TeWebServer::defineWeb() {
     delay(100);
   });
   httpServer->on("/mqtt.html", []() {
-   EthernetClient client;
-    String mqtt="";
-   if (client.connect("192.168.2.12", 80)) {
-    Serial.println("connected");
-    // Make a HTTP request:
-    client.println("GET /caca.html HTTP/1.1");
-    client.println("Host: 192.168.2.12");
-    client.println("Connection: close");
-    client.println();
-    while (client.available()) {
-       char mqtt=mqtt+client.read();
+    if ( ! configure->setArgs(*WebS->httpServer) ) {
+      WebS->gotoIndexHTML();
+      return;
     }
-    if (!client.connected()) client.stop();
-   }
-    WebS->httpServer->send(200, "text/html", mqtt );
+    String parameters[][2]={
+       {"%00a",""}
+    };    
+    String mqttmode=FPSTR(mqtthtml);
+    String htmlhead1=FPSTR(htmlhead);
+    String htmltail1=FPSTR(htmltail);
+    for(int i=0;i<sizeof(parameters)/sizeof(parameters[0]);i++) mqttmode.replace(parameters[i][0],parameters[i][1]);
+    WebS->httpServer->send(200, "text/html", htmlhead1+mqttmode+htmltail1 );
     delay(100);
   });
 
