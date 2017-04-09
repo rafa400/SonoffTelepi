@@ -1,16 +1,17 @@
-R"=====(<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN"  "http://www.w3.org/TR/html4/strict.dtd">
+<!DOCTYPE html>
 <html>
 <head>
-<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+   <title>TelePi</title>
+   <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
    <link href="VictorLozada.css" type="text/css" rel="stylesheet"/>
-<script type="text/javascript">
- function booting() {
-    document.getElementById("wifisetup").onclick = function () {  location.href = "wifisetup.html";  };
-    document.getElementById("workmode").onclick = function () {  location.href = "workmode.html";  };
-    document.getElementById("mqtt").onclick = function () {  location.href = "mqtt.html";  };
-    document.getElementById("update").onclick = function () {  location.href = "update";  };
-  }
-</script>
+   <script type="text/javascript">
+    function booting() {
+       document.getElementById("wifisetup").onclick = function () {  location.href = "wifisetup.html";  };
+       document.getElementById("workmode").onclick = function () {  location.href = "workmode.html";  };
+       document.getElementById("mqtt").onclick = function () {  location.href = "mqtt.html";  };
+       document.getElementById("update").onclick = function () {  location.href = "update";  };
+     }
+   </script>
 </head>
 <body onload="booting()">
  <section class="cform">
@@ -33,4 +34,3 @@ R"=====(<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN"  "http://www.w3.org/TR
 
 </body>
 </html>
-)====="

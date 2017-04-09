@@ -99,10 +99,8 @@ void TeWebServer::defineWeb() {
        {"%eso",TelePiVersion}
     };
     String wifisetup=FPSTR(wifisetuphtml);
-    String htmlhead1=FPSTR(htmlhead);
-    String htmltail1=FPSTR(htmltail);
     for(int i=0;i<sizeof(parameters)/sizeof(parameters[0]);i++) wifisetup.replace(parameters[i][0],parameters[i][1]);
-    WebS->httpServer->send(200, "text/html",htmlhead1+wifisetup+htmltail1);
+    WebS->httpServer->send(200, "text/html",wifisetup);
     delay(100);
   });
   httpServer->on("/workmode.html", []() {
@@ -137,10 +135,8 @@ void TeWebServer::defineWeb() {
        {"%17",CHECKED("gpio03sw","push")},
     };    
     String workmode=FPSTR(workmodehtml);
-    String htmlhead1=FPSTR(htmlhead);
-    String htmltail1=FPSTR(htmltail);
     for(int i=0;i<sizeof(parameters)/sizeof(parameters[0]);i++) workmode.replace(parameters[i][0],parameters[i][1]);
-    WebS->httpServer->send(200, "text/html", htmlhead1+workmode+htmltail1 );
+    WebS->httpServer->send(200, "text/html",workmode );
     delay(100);
   });
   httpServer->on("/mqtt.html", []() {
@@ -149,22 +145,22 @@ void TeWebServer::defineWeb() {
       return;
     }
     String parameters[][2]={
-       {"%00a",""}
+       {"%0s",CHECKEDdef("MQTTenabled","on","on")},
+       {"%1s",configure->getVariable("MQTTServerPath","/TelePi/Sonoff")},
+       {"%2s",configure->getVariable("MQTT_IP","192.168.0.1")},
+       {"%3s",configure->getVariable("MQTT_Port","1883")},
+       {"%4s",configure->getVariable("MQTTpassword","telepi")}
     };    
     String mqttmode=FPSTR(mqtthtml);
-    String htmlhead1=FPSTR(htmlhead);
-    String htmltail1=FPSTR(htmltail);
     for(int i=0;i<sizeof(parameters)/sizeof(parameters[0]);i++) mqttmode.replace(parameters[i][0],parameters[i][1]);
-    WebS->httpServer->send(200, "text/html", htmlhead1+mqttmode+htmltail1 );
+    WebS->httpServer->send(200, "text/html", mqttmode );
     delay(100);
   });
 
-/*
-  httpServer->on("/sonoff.svg", []() {
+/*  httpServer->on("/sonoff.svg", []() {
     WebS->httpServer->send(200, "image/svg+xml", sonoffsvgchar );
     delay(100);
-  });
-*/
+  });  */
 
   httpServer->on("/VictorLozada.css", []() {
     WebS->httpServer->send(200, "text/css", FPSTR(VictorLozada) );
