@@ -1,5 +1,13 @@
 #include "webserver.h"
 
+String timeruning(){
+  int sec = millis() / 1000;
+    int min = sec / 60;
+    int hr = min / 60;
+    sec=sec%60;
+    min=min%60;
+    return String(hr)+":"+String(min)+":"+String(sec);
+}
 
 TeWebServer::TeWebServer() {
   TeWebServer(80);
@@ -66,7 +74,13 @@ void TeWebServer::defineWeb() {
     delay(100);
   });
   httpServer->on("/index.html", []() {
-    WebS->httpServer->send(200, "text/html", FPSTR(indexhtml) );
+    String parameters[][2]={
+       {"%time",timeruning()},
+       {"%eso",TelePiVersion}
+    };
+    String index=FPSTR(indexhtml);
+    for(int i=0;i<sizeof(parameters)/sizeof(parameters[0]);i++) index.replace(parameters[i][0],parameters[i][1]);
+    WebS->httpServer->send(200, "text/html", index );
     delay(100);
   });
   httpServer->on("/wifisetup.html", []() {
@@ -74,11 +88,6 @@ void TeWebServer::defineWeb() {
       WebS->gotoIndexHTML();
       return;
     }
-    int sec = millis() / 1000;
-    int min = sec / 60;
-    int hr = min / 60;
-    sec=sec%60;
-    min=min%60;
     
     String parameters[][2]={
        {"%a1s",configure->getVariable("hostname",tewifi->def_hostname)},
@@ -95,7 +104,7 @@ void TeWebServer::defineWeb() {
        {"%4s",configure->getVariable("Wifi_GW")},
        {"%5s",configure->getVariable("Wifi_MSK")},
        {"%6s",configure->getVariable("Wifi_DNS")},
-       {"%time",String(hr)+":"+String(min)+":"+String(sec)},
+       {"%time",timeruning()},
        {"%eso",TelePiVersion}
     };
     String wifisetup=FPSTR(wifisetuphtml);
@@ -133,6 +142,8 @@ void TeWebServer::defineWeb() {
        {"%15",SELECTED("gpio03","NU")},
        {"%16",CHECKEDdef("gpio03sw","switch","switch")},
        {"%17",CHECKED("gpio03sw","push")},
+       {"%time",timeruning()},
+       {"%eso",TelePiVersion}
     };    
     String workmode=FPSTR(workmodehtml);
     for(int i=0;i<sizeof(parameters)/sizeof(parameters[0]);i++) workmode.replace(parameters[i][0],parameters[i][1]);
@@ -149,7 +160,9 @@ void TeWebServer::defineWeb() {
        {"%1s",configure->getVariable("MQTTServerPath","/TelePi/Sonoff")},
        {"%2s",configure->getVariable("MQTT_IP","192.168.0.1")},
        {"%3s",configure->getVariable("MQTT_Port","1883")},
-       {"%4s",configure->getVariable("MQTTpassword","telepi")}
+       {"%4s",configure->getVariable("MQTTpassword","telepi")},
+       {"%time",timeruning()},
+       {"%eso",TelePiVersion}
     };    
     String mqttmode=FPSTR(mqtthtml);
     for(int i=0;i<sizeof(parameters)/sizeof(parameters[0]);i++) mqttmode.replace(parameters[i][0],parameters[i][1]);
@@ -157,21 +170,39 @@ void TeWebServer::defineWeb() {
     delay(100);
   });
 
-/*  httpServer->on("/sonoff.svg", []() {
-    WebS->httpServer->send(200, "image/svg+xml", sonoffsvgchar );
-    delay(100);
-  });  */
-
-  httpServer->on("/VictorLozada.css", []() {
-    WebS->httpServer->send(200, "text/css", FPSTR(VictorLozada) );
+  
+  httpServer->on("/update.html", []() {
+    String parameters[][2]={
+       {"%time",timeruning()},
+       {"%eso",TelePiVersion}
+    };
+    String updates=FPSTR(updatehtml);
+    for(int i=0;i<sizeof(parameters)/sizeof(parameters[0]);i++) updates.replace(parameters[i][0],parameters[i][1]);
+    WebS->httpServer->send(200, "text/html", updates );
     delay(100);
   });
-  httpServer->on("/config.txt", []() {
-    WebS->httpServer->send(200, "text/plain", configure->readConfig() );
+
+  httpServer->on("/sonoff.svg", []() {
+    WebS->httpServer->send(200, "image/svg+xml", FPSTR(sonoffsvgchar) );
+    delay(100);
+  });
+
+  httpServer->on("/pure-release-0.6.2/pure-min.css", []() {
+    WebS->httpServer->send(200, "text/css", FPSTR(purecss) );
+    delay(100);
+  });
+  httpServer->on("/css/layouts/side-menu.css", []() {
+    WebS->httpServer->send(200, "text/css", FPSTR(sidemenucss) );
     delay(100);
   });
   httpServer->on("/js/ui.js", []() {
-    WebS->httpServer->send(200, "text/plain", "HOLA K ASE" );
+    WebS->httpServer->send(200, "application/javascript", FPSTR(jsuijs) );
+    delay(100);
+  });
+  
+  
+  httpServer->on("/config.txt", []() {
+    WebS->httpServer->send(200, "text/plain", configure->readConfig() );
     delay(100);
   });
   httpServer->on("/resetconfig", []() {
@@ -199,3 +230,4 @@ void TeWebServer::defineWeb() {
     delay(100);
   });
 }
+

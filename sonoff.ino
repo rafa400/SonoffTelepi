@@ -10,7 +10,7 @@
    @brief mDNS and OTA Constants
    @{
 */
-#define TelePiVersion "Ver: 1.2"
+#define TelePiVersion "Ver: 2.0"
 #define MQTT_SERVER "192.168.2.9"  // My mosquitto server
 /// @}
 
