@@ -6,8 +6,13 @@ export TELEPI=$(html-minifier --collapse-boolean-attributes --collapse-whitespac
 
 echo "#ifndef TELEPIHTML_H"
 echo "#define TELEPIHTML_H"
-minimiza VictorLozada.css
-echo 'const char VictorLozada[] PROGMEM = R"=====('$TELEPI')=====";'
+minimiza "pure-release-0.6.2/pure-min.css"
+echo 'const char purecss[] PROGMEM = R"=====('$TELEPI')=====";'
+minimiza "js/ui.js"
+echo 'const char jsuisj[] PROGMEM = R"=====('$TELEPI')=====";'
+minimiza "css/layouts/side-menu.css"
+echo 'const char sidemenucss[] PROGMEM = R"=====('$TELEPI')=====";'
+
 minimiza index.html
 echo 'const char indexhtml[] PROGMEM = R"=====('$TELEPI')=====";'
 minimiza wifisetup.html
@@ -16,6 +21,9 @@ minimiza workmode.html
 echo 'const char workmodehtml[] PROGMEM = R"=====('$TELEPI')=====";'
 minimiza mqtt.html
 echo 'const char mqtthtml[] PROGMEM = R"=====('$TELEPI')=====";'
+minimiza update.html
+echo 'const char updatehtml[] PROGMEM = R"=====('$TELEPI')=====";'
+
 
 echo "#endif //TELEPIHTML_H"
 exit 0

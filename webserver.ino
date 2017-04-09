@@ -170,6 +170,10 @@ void TeWebServer::defineWeb() {
     WebS->httpServer->send(200, "text/plain", configure->readConfig() );
     delay(100);
   });
+  httpServer->on("/js/ui.js", []() {
+    WebS->httpServer->send(200, "text/plain", "HOLA K ASE" );
+    delay(100);
+  });
   httpServer->on("/resetconfig", []() {
     configure->savedef();
     WebS->gotoIndexHTML();

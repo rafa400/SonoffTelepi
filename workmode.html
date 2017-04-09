@@ -1,103 +1,151 @@
-<!DOCTYPE html>
-<html>
+<!doctype html>
+<html lang="en">
 <head>
-  <title>TelePi</title>
-  <meta name="viewport" content="width=device-width,initial-scale=1.0">
-  <link href="VictorLozada.css" type="text/css" rel="stylesheet">
-  <style>
-  .tg  {border-collapse:collapse;border-spacing:0;}
-  .tg td{font-family:Arial, sans-serif;font-size:14px;padding:10px 5px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;}
-  .tg th{font-family:Arial, sans-serif;font-size:14px;font-weight:normal;padding:10px 5px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;}
-  .tg .tg-baqh{text-align:center;vertical-align:top}
-  select{text-align:center;vertical-align:top;width:25px}
-  option{text-align:center;vertical-align:top;width:25px}
-  </style>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="A layout example with a side menu that hides on mobile, just like the Pure website.">
+    <title>Responsive Side Menu &ndash; Layout Examples &ndash; Pure</title>
+    <link rel="stylesheet" type="text/css" href="/PureJS/pure-release-0.6.2/pure-min.css">
+
+
+
+        <!--[if lte IE 8]>
+            <link rel="stylesheet" href="css/layouts/side-menu-old-ie.css">
+        <![endif]-->
+        <!--[if gt IE 8]><!-->
+            <link rel="stylesheet" href="css/layouts/side-menu.css">
+        <!--<![endif]-->
 </head>
 <body>
-<form method="post">
- <section class="cform">
-   <article class="title">
-     <span>GPIO Config</span>
-   </article>
-   <article class="form">
-<div style="width:90%;margin-left:0px;text-align:center">
-     <table class="tg">
-       <tr>
-         <th class="tg-baqh"></th>
-         <th class="tg-baqh"></th>
-         <th class="tg-baqh">Switch</th>
-         <th class="tg-baqh">Button</th>
-       </tr>
-       <tr>
-         <td class="tg-baqh">Relay</td>
-         <td class="tg-baqh">OUT</td>
-         <td class="tg-baqh"></td>
-         <td class="tg-baqh"></td>
-       </tr>
-       <tr>
-         <td class="tg-baqh">Led</td>
-         <td class="tg-baqh">
-           <select class=rafa  id="gpio13" name="gpio13">
-             <option value="Relay" %00a>Relay</option>
-             <option value="Pulse" %00b>Pulse</option>
-             <option value="NU" %00c>N/U</option>
-           </select>
-         </td>
-         <td class="tg-baqh"></td>
-         <td class="tg-baqh"></td>
-       </tr>
-       <tr>
-         <td class="tg-baqh">Button</td>
-         <td class="tg-baqh">IN-Relay<br></td>
-         <td class="tg-baqh"><input type="radio" name="gpio00sw" value="switch" %01></td>
-         <td class="tg-baqh"><input type="radio" name="gpio00sw" value="push" %02></td>
-       </tr>
-       <tr>
-         <td class="tg-baqh">GPIO14<br></td>
-         <td class="tg-baqh">
-           <select class=rafa  id="gpio14" name="gpio14">
-             <option value="IN" %03>IN</option>
-             <option value="IN-R" %b3>IN-Relay</option>
-             <option value="OUT" %04>OUT</option>
-             <option value="NU" %05>N/U</option>
-           </select>
-         </td>
-         <td class="tg-baqh"><input type="radio" name="gpio14sw" value="switch" %06></td>
-         <td class="tg-baqh"><input type="radio" name="gpio14sw" value="push" %07></td>
-       </tr>
-       <tr>
-         <td class="tg-baqh">GPIO01<br></td>
-         <td class="tg-baqh">
-           <select class=rafa  id="gpio01" name="gpio01">
-             <option value="IN" %08>IN</option>
-             <option value="IN-R" %b8>IN-Relay</option>
-             <option value="OUT" %09>OUT</option>
-             <option value="NU" %10>N/U</option>
-           </select>
-         </td>
-         <td class="tg-baqh"><input type="radio" name="gpio01sw" value="switch" %11></td>
-         <td class="tg-baqh"><input type="radio" name="gpio01sw" value="push" %12></td>
-       </tr>
-       <tr>
-         <td class="tg-baqh">GPIO03</td>
-         <td class="tg-baqh">
-           <select class=rafa  id="gpio03" name="gpio03">
-             <option value="IN" %13>IN</option>
-             <option value="IN-R" %b13>IN-Relay</option>
-             <option value="OUT" %14>OUT</option>
-             <option value="NU" %15>N/U</option>
-           </select>
-         </td>
-         <td class="tg-baqh"><input type="radio" name="gpio03sw" value="switch" %16></td>
-         <td class="tg-baqh"><input type="radio" name="gpio03sw" value="push" %17></td>
-       </tr>
-     </table>
+
+
+
+
+
+
+<div id="layout">
+    <!-- Menu toggle -->
+    <a href="#menu" id="menuLink" class="menu-link">
+        <!-- Hamburger icon -->
+        <span></span>
+    </a>
+
+    <div id="menu">
+        <div class="pure-menu">
+            <a class="pure-menu-heading" href="#">TelePi</a>
+            <ul class="pure-menu-list">
+              <li class="pure-menu-item" class="menu-item-divided pure-menu-selected"><a href="index.html" class="pure-menu-link">Wifi Setup</a></li>
+              <li class="pure-menu-item"><a href="workmode.html" class="pure-menu-link">Work Mode</a></li>
+              <li class="pure-menu-item"><a href="mqtt.html" class="pure-menu-link">MQTT Update</a></li>
+              <li class="pure-menu-item"><a href="update.html" class="pure-menu-link">Firmware Update</a></li>
+            </ul>
+        </div>
+    </div>
+
+    <div id="main">
+      <div class="header">
+         <h2>%eso  Uptime: %time</h2>
+         <h2>Powered by TelePi.org</h2>
+      </div>
+      <div class="content">
+      <form class="pure-form pure-form-aligned">
+      <fieldset>
+        <legend>Work Mode</legend>
+      <div class="content" style="justify-content: center;text-align: center;">
+      <table class="pure-table pure-table-bordered">
+          <thead>
+              <tr>
+                  <th>I/O</th>
+                  <th>Mode</th>
+                  <th>Switch</th>
+                  <th>Button</th>
+              </tr>
+          </thead>
+          <tbody>
+              <tr class="pure-table-odd">
+                  <td>Relay(R)</td>
+                  <td>OUT</td>
+                  <td></td>
+                  <td></td>
+              </tr>
+              <tr class="pure-table-odd">
+                <td>Led</td>
+                <td>
+                  <select id="gpio13" name="gpio13">
+                    <option value="Relay" %00a>Relay</option>
+                    <option value="Pulse" %00b>Pulse</option>
+                    <option value="NU" %00c>N/U</option>
+                  </select>
+                </td>
+                <td></td>
+                <td></td>
+              </tr>
+
+              <tr>
+                <td>Button</td>
+                <td>IN-Relay<br></td>
+                <td><input type="radio" style="transform: scale(1.5);" name="gpio00sw" value="switch" %01></td>
+                <td><input type="radio" style="transform: scale(1.5);" name="gpio00sw" value="push" %02></td>
+              </tr>
+              <tr>
+                <td>GPIO14<br></td>
+                <td>
+                  <select id="gpio14" name="gpio14">
+                    <option value="IN" %03>IN</option>
+                    <option value="IN-R" %b3>IN-R</option>
+                    <option value="OUT" %04>OUT</option>
+                    <option value="NU" %05>N/U</option>
+                  </select>
+                </td>
+                <td><input type="radio" style="transform: scale(1.5);" name="gpio14sw" value="switch" %06></td>
+                <td><input type="radio" style="transform: scale(1.5);" name="gpio14sw" value="push" %07></td>
+              </tr>
+              <tr>
+                <td>GPIO01<br></td>
+                <td>
+                  <select id="gpio01" name="gpio01">
+                    <option value="IN" %08>IN</option>
+                    <option value="IN-R" %b8>IN-R</option>
+                    <option value="OUT" %09>OUT</option>
+                    <option value="NU" %10>N/U</option>
+                  </select>
+                </td>
+                <td><input type="radio" style="transform: scale(1.5);" name="gpio01sw" value="switch" %11></td>
+                <td><input type="radio" style="transform: scale(1.5);" name="gpio01sw" value="push" %12></td>
+              </tr>
+              <tr>
+                <td>GPIO03</td>
+                <td>
+                  <select id="gpio03" name="gpio03">
+                    <option value="IN" %13>IN</option>
+                    <option value="IN-R" %b13>IN-R</option>
+                    <option value="OUT" %14>OUT</option>
+                    <option value="NU" %15>N/U</option>
+                  </select>
+                </td>
+                <td>
+                    <input type="radio" style="transform: scale(1.5);" name="gpio03sw" value="switch" %16></td>
+                  </label>
+                <td>
+                    <input type="radio" style="transform: scale(1.5);" name="gpio03sw" value="push" %17></td>
+                  </label>
+              </tr>
+
+          </tbody>
+      </table>
+    </div>
+    </fieldset>
+    <fieldset>  <legend></legend>
+      <input class="pure-button pure-button-primary" id="wifisetup" type="submit" name="save" value="Save">
+      <input class="pure-button pure-button-primary" id="cancel" type="submit" name="cancel" value="Cancel">
+    </fieldset>
+    </form>
+    </div>
+
+    </div>
 </div>
-   </article>
-   <article class="btn">
-     <input id="wifisetup" type="submit" name="save" value="Save"><input id="cancel" type="submit" name="cancel" value="Cancel">
-   </article>
- </section>
-</form>
+
+<script src="js/ui.js"></script>
+
 </body>
 </html>
