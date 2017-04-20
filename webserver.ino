@@ -73,6 +73,13 @@ void TeWebServer::defineWeb() {
     changeOUT_OFF(GPIO12Relay);
     delay(100);
   });
+  httpServer->on("/change", []() {
+    if (changeOUT(GPIO12Relay))
+      WebS->httpServer->send(200, "text/html",  WebS->jsonPage + " [ { 'Relay1':'Off' } ]}"  );
+    else
+      WebS->httpServer->send(200, "text/html",  WebS->jsonPage + " [ { 'Relay1':'On' } ]}"  );
+    delay(100);
+  });
   httpServer->on("/index.html", []() {
     String parameters[][2]={
        {"%time",timeruning()},
@@ -155,9 +162,11 @@ void TeWebServer::defineWeb() {
       WebS->gotoIndexHTML();
       return;
     }
+    if ( ! configure->getVariable("MQTTServerPath").endsWith("/") )
+      configure->setVariable("MQTTServerPath", configure->getVariable("MQTTServerPath")+"/");
     String parameters[][2]={
-       {"%0s",CHECKEDdef("MQTTenabled","on","on")},
-       {"%1s",configure->getVariable("MQTTServerPath","/TelePi/Sonoff")},
+       {"%0s",CHECKED("MQTTenabled","on")},
+       {"%1s",configure->getVariable("MQTTServerPath","TelePi/Sonoff")},
        {"%2s",configure->getVariable("MQTT_IP","192.168.0.1")},
        {"%3s",configure->getVariable("MQTT_Port","1883")},
        {"%4s",configure->getVariable("MQTTpassword","telepi")},
@@ -193,6 +202,10 @@ void TeWebServer::defineWeb() {
   });
   httpServer->on("/css/layouts/side-menu.css", []() {
     WebS->httpServer->send(200, "text/css", FPSTR(sidemenucss) );
+    delay(100);
+  });
+  httpServer->on("/css/button.css", []() {
+    WebS->httpServer->send(200, "text/css", FPSTR(buttoncss) );
     delay(100);
   });
   httpServer->on("/js/ui.js", []() {

@@ -6,12 +6,28 @@
 #include <DNSServer.h>
 #include <ESP8266mDNS.h>
 
+/* //https://github.com/milesburton/Arduino-Temperature-Control-Library
+ * // Tambien hay que instalar la libreria de OneWire desde el IDE de Arduino
+#include <OneWire.h>
+#include "DallasTemperature.h"
+
+#define ONE_WIRE_BUS 14
+// Setup a oneWire instance to communicate with any OneWire devices (not just Maxim/Dallas temperature ICs)
+OneWire oneWire(ONE_WIRE_BUS);
+// Pass our oneWire reference to Dallas Temperature. 
+DallasTemperature sensors(&oneWire);
+// arrays to hold device address
+DeviceAddress insideThermometer;
+......
+*/
+
+/*
+
 /**
    @brief mDNS and OTA Constants
    @{
 */
-#define TelePiVersion "Ver: 2.0"
-#define MQTT_SERVER "192.168.2.9"  // My mosquitto server
+#define TelePiVersion "Ver: 2.1"
 /// @}
 
 #define max_variable 150  // Max variable length 
@@ -72,22 +88,25 @@ int gpioP[15]={LOW,LOW,LOW,LOW,LOW,LOW,LOW,LOW,LOW,LOW,LOW,LOW,LOW,LOW,LOW};
 char message_buff[100];
 char topic_buff[100];
 void mqttmessage(int gpio,int value,String mytype) {
-    if (!mqttClient.connected()) return;
+    if (!mqttClient.connected() || configure->getVariable("MQTTenabled")!="on") return;
     String pubString = "{\"report\":{\"light\": \"" + String(value) + "\"}}";
 //    pubString.toCharArray(message_buff, pubString.length()+1);
-    String topicString = "telepi/"+mytype+"/"+configure->getVariable("hostname")+"/"+String(gpio);
+    String topicString = configure->getVariable("MQTTServerPath")+mytype+"/"+configure->getVariable("hostname")+"/"+String(gpio);
 //    topicString.toCharArray(topic_buff, topicString.length()+1);
     if (mqttClient.publish(topicString.c_str(), pubString.c_str())==false) {
-//        mqttClient = PubSubClient(MQTT_SERVER, 1883, callback,wifiClient);
+//        mqttClient = PubSubClient(configure->getVariable("MQTT_IP"), configure->getVariable("MQTT_Port"), callback,wifiClient);
         mqttClient.connect(tewifi->hostname.c_str(),"admin","<kitipasa>");
     }
 }
 
 bool changeOUT(int gpioout) {
-   if (gpioO[gpioout]==LOW) 
+   if (gpioO[gpioout]==LOW) {
       changeOUT_ON(gpioout);
-   else 
+      return false;
+   } else {
       changeOUT_OFF(gpioout);
+      return true;
+   }
 }
 bool changeOUT_ON(int gpioout) {
          gpioO[gpioout]=HIGH;
@@ -170,6 +189,7 @@ void setup(void) {
       tewifi->modeDefaultWifiAP();
       bootmode=APFIXED;
     } else {
+      configure->savedef();
       //WiFi.mode(WIFI_AP_STA);
       //delay(500);
       WiFi.beginSmartConfig();
@@ -199,34 +219,35 @@ void setup(void) {
   ArduinoOTA.begin();
   blink(GPIO13Led, 600, 3);
   
-  if ( bootmode==APDEFAULT) {
-    mqttClient = PubSubClient(MQTT_SERVER, 1883, callback,wifiClient);
-    mqttClient.connect(tewifi->hostname.c_str(),"admin","<kitipasa>");
-    String subscribeme="telepi/DEBUG/"+configure->getVariable("hostname")+"/BootIP";
+  if ( (bootmode==APDEFAULT) && (configure->getVariable("MQTTenabled")=="on") ) {
+    mqttClient = PubSubClient( TeWifi::parseIP(configure->getVariable("MQTT_IP")), configure->getVariable("MQTT_Port").toInt(), callback,wifiClient);
+    mqttClient.connect(tewifi->hostname.c_str(),"admin",configure->getVariable("MQTTpassword").c_str());
+    String subscribeme=configure->getVariable("MQTTServerPath")+"DEBUG/"+configure->getVariable("hostname")+"/BootIP";
     IPAddress ip=WiFi.localIP();
     String myip=String(ip[0])+"."+String(ip[1])+"."+String(ip[2])+"."+String(ip[3]);
     mqttClient.publish(subscribeme.c_str(), myip.c_str());
     
-    subscribeme="telepi/Relay/OUT/"+configure->getVariable("hostname")+"/#";
+    subscribeme=configure->getVariable("MQTTServerPath")+"Relay/OUT/"+configure->getVariable("hostname")+"/#";
     mqttClient.subscribe(subscribeme.c_str());
   }
+
+  if (!MDNS.begin(configure->getVariable("hostname").c_str())) {
+    while(1) delay(1000);
+  } else
+    MDNS.addService("http", "tcp", 80);
   
 }
 
 void loop(void) {
  // tewifi->checkWifi();
   WebS->httpServer->handleClient();
-  dealwithgpio(GPIO00Button,GPIO12Relay);
-  dealwithgpio(GPIO14Pin,GPIO12Relay);
-  dealwithgpio(GPIO03RX,GPIO12Relay);
-  dealwithgpio(GPIO01TX,GPIO12Relay);
-
-  if ( bootmode==APDEFAULT) mqttClient.loop(); 
-  else {
-    if (MDNS.begin(tewifi->hostname.c_str())) {
-        MDNS.addService("esp", "tcp", 80); // Announce esp tcp service on port 8080
-    }
+  if ( bootmode==APDEFAULT) {
+   dealwithgpio(GPIO00Button,GPIO12Relay);
+   dealwithgpio(GPIO14Pin,GPIO12Relay);
+   dealwithgpio(GPIO03RX,GPIO12Relay);
+   dealwithgpio(GPIO01TX,GPIO12Relay);
   }
+  if ( bootmode==APDEFAULT) mqttClient.loop(); 
 
   ArduinoOTA.handle(); //  Handle OTA server.
   yield();
@@ -242,7 +263,7 @@ void callback(char* topic, byte* payload, unsigned int length) {
   message_buff[i] = '\0';
   String msgString = String(message_buff);
 
-  String topicString = "telepi/DEBUG/"+configure->getVariable("hostname")+"/RECEIVED";
+  String topicString = configure->getVariable("MQTTServerPath")+"DEBUG/"+configure->getVariable("hostname")+"/RECEIVED";
   mqttClient.publish(topicString.c_str(), message_buff);
 
   if (msgString.equals("{\"command\":{\"relaymode\": \"OFF\"}}")) {
@@ -252,7 +273,7 @@ void callback(char* topic, byte* payload, unsigned int length) {
   } else if (msgString.equals("{\"command\":{\"relaymode\": \"SENSE\"}}")) {
     //senseMode = MODE_SENSE;
   } else {
-      topicString = "telepi/DEBUG/"+configure->getVariable("hostname")+"/RECEIVED";
+      topicString =  configure->getVariable("MQTTServerPath")+"DEBUG/"+configure->getVariable("hostname")+"/RECEIVED";
       mqttClient.publish(topicString.c_str(), msgString.c_str());
   }
 }

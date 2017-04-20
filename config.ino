@@ -139,9 +139,9 @@ void Conf::setUserPassword(String user,String password){
 bool Conf::setArgs(ESP8266WebServer &WebServer) {
   String content = " ";  // Meter un espacio en blanco en sprintf cuelga!!
   if (WebServer.args() > 0 ) {
-    for ( uint8_t i = 0; i < WebServer.args(); i++ ) {
-      if(WebServer.argName(i)=="cancel") return false;
-      if(WebServer.argName(i)=="save") {
+    for ( uint8_t j = 0; j < WebServer.args(); j++ ) {
+      if(WebServer.argName(j)=="cancel") return false;
+      if(WebServer.argName(j)=="save") {
         if (WebServer.args() > 0 ) {
           for ( uint8_t i = 0; i < WebServer.args(); i++ ) {
               content = content + "\r\n" + WebServer.argName(i) + "--" + WebServer.arg(i);

@@ -9,6 +9,7 @@ echo "#define TELEPIHTML_H"
 echo 'const char purecss[] PROGMEM = R"=====('"`cat "pure-release-0.6.2/pure-min.css"`"')=====";'
 echo 'const char jsuijs[] PROGMEM = R"=====('"`cat "js/ui.js"`"')=====";'
 echo 'const char sidemenucss[] PROGMEM = R"=====('"`cat "css/layouts/side-menu.css"`"')=====";'
+echo 'const char buttoncss[] PROGMEM = R"=====('"`cat "css/button.css"`"')=====";'
 echo 'const char sonoffsvgchar[] PROGMEM = R"=====('"`cat "sonoff.svg"`"')=====";'
 
 echo 'const char indexhtml[] PROGMEM = R"=====('"`cat index.html`"')=====";'
