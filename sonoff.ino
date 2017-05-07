@@ -172,6 +172,7 @@ bool dealwithgpio(int gpioin,int gpioout) {
 
 #define APDEFAULT 0
 #define APSMARTCONF 1
+#define APSTANDALONE 2
 int bootmode=APDEFAULT;
 
 void setup(void) {
@@ -201,8 +202,10 @@ void setup(void) {
        }
     }
   } else {
-    tewifi->modeWifiClient();
     bootmode=APDEFAULT;
+    if (configure->getVariable("wifimode")=="CLI") { tewifi->modeWifiClient(); bootmode=APDEFAULT; }
+    if (configure->getVariable("wifimode")=="AP")  { tewifi->modeWifiAP();     bootmode=APSTANDALONE; }
+    if (configure->getVariable("wifimode")=="ADH") { tewifi->modeWifiClient(); bootmode=APDEFAULT; }
   }
 
   pinMode(GPIO12Relay, OUTPUT);
@@ -229,11 +232,12 @@ void setup(void) {
     mqttClient.subscribe(subscribeme.c_str());
   }
 
+/*
   if (!MDNS.begin(configure->getVariable("hostname").c_str())) {
     while(1) delay(1000);
   } else
     MDNS.addService("http", "tcp", 80);
-  
+*/  
 }
 
 void loop(void) {
