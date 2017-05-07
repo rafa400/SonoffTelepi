@@ -27,7 +27,7 @@ DeviceAddress insideThermometer;
    @brief mDNS and OTA Constants
    @{
 */
-#define TelePiVersion "Ver: 2.1"
+#define TelePiVersion "Ver: 3.0"
 /// @}
 
 #define max_variable 150  // Max variable length 
@@ -64,6 +64,7 @@ void blink(int gpionum, int one, int num) {
     delay(one / 2);
     digitalWrite(gpionum, LOW);
     delay(one / 2);
+    yield();
   }
   digitalWrite(gpionum, state);
   return;
@@ -76,6 +77,7 @@ int filter(int input, int state, int dsec) {
     i += inc;
     pinMode(input, INPUT_PULLUP);
     if (digitalRead(input) != state) return false;
+    yield();
   }
   return true;
 }
@@ -169,8 +171,7 @@ bool dealwithgpio(int gpioin,int gpioout) {
 }
 
 #define APDEFAULT 0
-#define APFIXED 1
-#define APSMARTCONF 2
+#define APSMARTCONF 1
 int bootmode=APDEFAULT;
 
 void setup(void) {
@@ -185,22 +186,19 @@ void setup(void) {
     blink(GPIO13Led, 500, 8);
     if (filter(GPIO00Button, LOW, 700)) { //Check if button is HIGH for ~700ms
       blink(GPIO13Led, 250, 16);
-//      configure->reset();
-      tewifi->modeDefaultWifiAP();
-      bootmode=APFIXED;
-    } else {
-      configure->savedef();
-      //WiFi.mode(WIFI_AP_STA);
-      //delay(500);
-      WiFi.beginSmartConfig();
-      bootmode=APSMARTCONF;
-      while(1){
-         delay(1000);
-         if(WiFi.smartConfigDone()){
-            //Serial.println("SmartConfig Success");
-            break;
-         }
-      }
+      configure->savedef();  // Make a factory reset
+    } 
+    WiFi.softAPdisconnect();
+    WiFi.disconnect();      
+    delay(500);
+    WiFi.beginSmartConfig();
+    bootmode=APSMARTCONF;
+    while(1){
+       delay(1000);
+       if(WiFi.smartConfigDone()){
+          //Serial.println("SmartConfig Success");
+          break;
+       }
     }
   } else {
     tewifi->modeWifiClient();

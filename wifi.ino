@@ -25,6 +25,8 @@ IPAddress TeWifi::parseIP(String ip) {
   return IPAddress(a1, a2, a3, a4);
 }
 bool TeWifi::modeWifiAP() {
+  WiFi.softAPdisconnect();
+  WiFi.disconnect();
   WiFi.mode(WIFI_AP_STA);
   WiFi.softAPConfig( TeWifi::parseIP(configure->getVariable("Wifi_IP")), TeWifi::parseIP(configure->getVariable("Wifi_GW")), TeWifi::parseIP(configure->getVariable("Wifi_MSK")) );
   WiFi.softAP("TardisTime");
@@ -33,18 +35,11 @@ bool TeWifi::modeWifiAP() {
   }
   return true;
 }
-bool TeWifi::modeDefaultWifiAP() {
-  WiFi.mode(WIFI_AP);
-  WiFi.softAPConfig( TeWifi::parseIP("192.168.0.1"), TeWifi::parseIP("192.168.0.1"), TeWifi::parseIP("255.255.255.0") );
-  WiFi.softAP("TelePiSonoff", "kitipasa" );
-  if (!WiFi.softAP("TelePiSonoff", "kitipasa" )) {
-    return false;
-  }
-  WiFi.softAPConfig( TeWifi::parseIP("192.168.0.1"), TeWifi::parseIP("192.168.0.1"), TeWifi::parseIP("255.255.255.0") );  
-  dnsServer.start(DNS_PORT, "*", TeWifi::parseIP("192.168.0.1"));
-  return true;
-}
-bool TeWifi::modeWifiClient() {
+bool TeWifi::modeWifiClient() { 
+  WiFi.softAPdisconnect(); // ESP's WiFi module stores its own config on chip and he expects to overwrite it clearly. Do not make him to try something common, define configs clearly and stop unrelated previous operations -- http://stackoverflow.com/questions/39688410/how-to-switch-to-normal-wifi-mode-to-access-point-mode-esp8266 
+  WiFi.disconnect();
+  WiFi.mode(WIFI_STA);
+  delay(100);
   if (configure->getVariable("dhcp") == "FIXIP") {
   // ESP does not follow same order as arduino ( DNS is at the end) -- https://github.com/esp8266/Arduino/blob/master/libraries/ESP8266WiFi/src/ESP8266WiFiSTA.h#L42    
     WiFi.config(  TeWifi::parseIP(configure->getVariable("Wifi_IP")), TeWifi::parseIP(configure->getVariable("Wifi_GW")), TeWifi::parseIP(configure->getVariable("Wifi_MSK")),TeWifi::parseIP(configure->getVariable("Wifi_DNS")) );
