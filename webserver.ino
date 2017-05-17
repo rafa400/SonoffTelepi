@@ -98,9 +98,8 @@ void TeWebServer::defineWeb() {
     
     String parameters[][2]={
        {"%a1s",configure->getVariable("hostname",tewifi->def_hostname)},
-       {"%a2s",SELECTEDdef("wifimode","AP","CLI")},
+       {"%a2s",SELECTEDdef("wifimode","AP","AP")},
        {"%a3s",SELECTED("wifimode","CLI")},
-       {"%a4s",SELECTED("wifimode","ADH")},
        {"%a5s",configure->getVariable("wifiSSID","KITIPASA")},
        {"%a6s",configure->getVariable("wifipassword","<kitipasa>")},
        

@@ -46,7 +46,7 @@ bool Conf::savedef() {
   getVariable("Wifi_MSK","255.255.255.0");
   getVariable("Wifi_DNS","8.8.8.8");
   getVariable("user_admin","21232f297a57a5a743894a0e4a801fc3");
-  getVariable("wifimode","CLI");
+  getVariable("wifimode","AP");
   getVariable("dhcp","DHCP");
   getVariable("gpio00","IN-R");
   getVariable("gpio13","Pulse");

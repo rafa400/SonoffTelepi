@@ -91,9 +91,9 @@ char message_buff[100];
 char topic_buff[100];
 void mqttmessage(int gpio,int value,String mytype) {
     if (!mqttClient.connected() || configure->getVariable("MQTTenabled")!="on") return;
-    String pubString = "{\"report\":{\"light\": \"" + String(value) + "\"}}";
+    String pubString = (String(value)=="0"?"OFF":"ON");
 //    pubString.toCharArray(message_buff, pubString.length()+1);
-    String topicString = configure->getVariable("MQTTServerPath")+mytype+"/"+configure->getVariable("hostname")+"/"+String(gpio);
+    String topicString = configure->getVariable("MQTTServerPath")+(mytype=="Relay"?"":mytype+"/")+configure->getVariable("hostname")+(String(gpio)=="12"?"":"/"+String(gpio));
 //    topicString.toCharArray(topic_buff, topicString.length()+1);
     if (mqttClient.publish(topicString.c_str(), pubString.c_str())==false) {
 //        mqttClient = PubSubClient(configure->getVariable("MQTT_IP"), configure->getVariable("MQTT_Port"), callback,wifiClient);
@@ -205,7 +205,6 @@ void setup(void) {
     bootmode=APDEFAULT;
     if (configure->getVariable("wifimode")=="CLI") { tewifi->modeWifiClient(); bootmode=APDEFAULT; }
     if (configure->getVariable("wifimode")=="AP")  { tewifi->modeWifiAP();     bootmode=APSTANDALONE; }
-    if (configure->getVariable("wifimode")=="ADH") { tewifi->modeWifiClient(); bootmode=APDEFAULT; }
   }
 
   pinMode(GPIO12Relay, OUTPUT);
@@ -228,7 +227,7 @@ void setup(void) {
     String myip=String(ip[0])+"."+String(ip[1])+"."+String(ip[2])+"."+String(ip[3]);
     mqttClient.publish(subscribeme.c_str(), myip.c_str());
     
-    subscribeme=configure->getVariable("MQTTServerPath")+"Relay/OUT/"+configure->getVariable("hostname")+"/#";
+    subscribeme=configure->getVariable("MQTTServerPath")+configure->getVariable("hostname")+"/set/#";
     mqttClient.subscribe(subscribeme.c_str());
   }
 
@@ -268,11 +267,11 @@ void callback(char* topic, byte* payload, unsigned int length) {
   String topicString = configure->getVariable("MQTTServerPath")+"DEBUG/"+configure->getVariable("hostname")+"/RECEIVED";
   mqttClient.publish(topicString.c_str(), message_buff);
 
-  if (msgString.equals("{\"command\":{\"relaymode\": \"OFF\"}}")) {
+  if (msgString.equals("OFF")) {
       changeOUT_OFF(GPIO12Relay);
-  } else if (msgString.equals("{\"command\":{\"relaymode\": \"ON\"}}")) {
+  } else if (msgString.equals("ON")) {
       changeOUT_ON(GPIO12Relay);
-  } else if (msgString.equals("{\"command\":{\"relaymode\": \"SENSE\"}}")) {
+  } else if (msgString.equals("SENSE")) {
     //senseMode = MODE_SENSE;
   } else {
       topicString =  configure->getVariable("MQTTServerPath")+"DEBUG/"+configure->getVariable("hostname")+"/RECEIVED";
