@@ -5,6 +5,7 @@
 #include "webserver.h"
 #include <DNSServer.h>
 #include <ESP8266mDNS.h>
+#include <TimeAlarms.h>
 
 /* //https://github.com/milesburton/Arduino-Temperature-Control-Library
  * // Tambien hay que instalar la libreria de OneWire desde el IDE de Arduino
@@ -85,21 +86,6 @@ int filter(int input, int state, int dsec) {
 int gpioI[15]={HIGH,HIGH,HIGH,HIGH,HIGH,HIGH,HIGH,HIGH,HIGH,HIGH,HIGH,HIGH,HIGH,HIGH,HIGH};
 int gpioO[15]={LOW,LOW,LOW,LOW,LOW,LOW,LOW,LOW,LOW,LOW,LOW,LOW,LOW,LOW,LOW};
 int gpioP[15]={LOW,LOW,LOW,LOW,LOW,LOW,LOW,LOW,LOW,LOW,LOW,LOW,LOW,LOW,LOW};
-
-
-char message_buff[100];
-char topic_buff[100];
-void mqttmessage(int gpio,int value,String mytype) {
-    if (!mqttClient.connected() || configure->getVariable("MQTTenabled")!="on") return;
-    String pubString = (String(value)=="0"?"OFF":"ON");
-//    pubString.toCharArray(message_buff, pubString.length()+1);
-    String topicString = configure->getVariable("MQTTServerPath")+(mytype=="Relay"?"":mytype+"/")+configure->getVariable("hostname")+(String(gpio)=="12"?"":"/"+String(gpio));
-//    topicString.toCharArray(topic_buff, topicString.length()+1);
-    if (mqttClient.publish(topicString.c_str(), pubString.c_str())==false) {
-//        mqttClient = PubSubClient(configure->getVariable("MQTT_IP"), configure->getVariable("MQTT_Port"), callback,wifiClient);
-        mqttClient.connect(tewifi->hostname.c_str(),"admin","<kitipasa>");
-    }
-}
 
 bool changeOUT(int gpioout) {
    if (gpioO[gpioout]==LOW) {
@@ -208,17 +194,9 @@ void setup(void) {
   ArduinoOTA.begin();
   blink(GPIO13Led, 600, 3);
   
-  if ( (bootmode==APDEFAULT) && (configure->getVariable("MQTTenabled")=="on") ) {
-    mqttClient = PubSubClient( TeWifi::parseIP(configure->getVariable("MQTT_IP")), configure->getVariable("MQTT_Port").toInt(), callback,wifiClient);
-    mqttClient.connect(tewifi->hostname.c_str(),"admin",configure->getVariable("MQTTpassword").c_str());
-    String subscribeme=configure->getVariable("MQTTServerPath")+"DEBUG/"+configure->getVariable("hostname")+"/BootIP";
-    IPAddress ip=WiFi.localIP();
-    String myip=String(ip[0])+"."+String(ip[1])+"."+String(ip[2])+"."+String(ip[3]);
-    mqttClient.publish(subscribeme.c_str(), myip.c_str());
-    
-    subscribeme=configure->getVariable("MQTTServerPath")+configure->getVariable("hostname")+"/set/#";
-    mqttClient.subscribe(subscribeme.c_str());
-  }
+  mqtton();
+
+  Alarm.timerOnce(300, tewifi->checkWifi);        // called once after 5min
 
 /*
   if (!MDNS.begin(configure->getVariable("hostname").c_str())) {
@@ -231,42 +209,16 @@ void setup(void) {
 void loop(void) {
   WebS->httpServer->handleClient();
   if ( bootmode==APDEFAULT) {
-   tewifi->checkWifi();
+   //tewifi->checkWifi();
    dealwithgpio(GPIO00Button,GPIO12Relay);
    dealwithgpio(GPIO14Pin,GPIO12Relay);
    dealwithgpio(GPIO03RX,GPIO12Relay);
    dealwithgpio(GPIO01TX,GPIO12Relay);
   }
-  if ( bootmode==APDEFAULT) mqttClient.loop(); 
-
+  mqttcheck();
+ 
   ArduinoOTA.handle(); //  Handle OTA server.
   yield();
 
 }
-
-void callback(char* topic, byte* payload, unsigned int length) {
-  int i = 0;
-  // create character buffer with ending null terminator (string)
-  for(i=0; i<length; i++) {
-    message_buff[i] = payload[i];
-  }  
-  message_buff[i] = '\0';
-  String msgString = String(message_buff);
-
-  String topicString = configure->getVariable("MQTTServerPath")+"DEBUG/"+configure->getVariable("hostname")+"/RECEIVED";
-  mqttClient.publish(topicString.c_str(), message_buff);
-
-  if (msgString.equals("OFF")) {
-      changeOUT_OFF(GPIO12Relay);
-  } else if (msgString.equals("ON")) {
-      changeOUT_ON(GPIO12Relay);
-  } else if (msgString.equals("SENSE")) {
-    //senseMode = MODE_SENSE;
-  } else {
-      topicString =  configure->getVariable("MQTTServerPath")+"DEBUG/"+configure->getVariable("hostname")+"/RECEIVED";
-      mqttClient.publish(topicString.c_str(), msgString.c_str());
-  }
-}
-
-
 

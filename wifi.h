@@ -31,7 +31,7 @@ class TeWifi {
     bool modeWifiAP();
     bool modeAndroidApp();
     bool modeWifiClient();
-    bool checkWifi();
+    static void checkWifi();
 
 };
 
