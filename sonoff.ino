@@ -188,19 +188,8 @@ void setup(void) {
     if (filter(GPIO00Button, LOW, 700)) { //Check if button is HIGH for ~700ms
       blink(GPIO13Led, 250, 16);
       configure->savedef();  // Make a factory reset
-    } 
-    WiFi.softAPdisconnect();
-    WiFi.disconnect();      
-    delay(500);
-    WiFi.beginSmartConfig();
-    bootmode=APSMARTCONF;
-    while(1){
-       delay(1000);
-       if(WiFi.smartConfigDone()){
-          //Serial.println("SmartConfig Success");
-          break;
-       }
     }
+    tewifi->modeAndroidApp(); bootmode=APSMARTCONF;
   } else {
     bootmode=APDEFAULT;
     if (configure->getVariable("wifimode")=="CLI") { tewifi->modeWifiClient(); bootmode=APDEFAULT; }
@@ -240,9 +229,9 @@ void setup(void) {
 }
 
 void loop(void) {
- // tewifi->checkWifi();
   WebS->httpServer->handleClient();
   if ( bootmode==APDEFAULT) {
+   tewifi->checkWifi();
    dealwithgpio(GPIO00Button,GPIO12Relay);
    dealwithgpio(GPIO14Pin,GPIO12Relay);
    dealwithgpio(GPIO03RX,GPIO12Relay);

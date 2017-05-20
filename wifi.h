@@ -29,6 +29,7 @@ class TeWifi {
     TeWifi();
     TeWifi(Conf *conf);
     bool modeWifiAP();
+    bool modeAndroidApp();
     bool modeWifiClient();
     bool checkWifi();
 

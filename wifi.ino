@@ -35,6 +35,19 @@ bool TeWifi::modeWifiAP() {
   }
   return true;
 }
+bool TeWifi::modeAndroidApp() {
+    WiFi.softAPdisconnect();
+    WiFi.disconnect();      
+    delay(500);
+    WiFi.beginSmartConfig();
+    while(1){
+       delay(1000);
+       if(WiFi.smartConfigDone()){
+          //Serial.println("SmartConfig Success");
+          break;
+       }
+    }
+}
 bool TeWifi::modeWifiClient() { 
   WiFi.softAPdisconnect(); // ESP's WiFi module stores its own config on chip and he expects to overwrite it clearly. Do not make him to try something common, define configs clearly and stop unrelated previous operations -- http://stackoverflow.com/questions/39688410/how-to-switch-to-normal-wifi-mode-to-access-point-mode-esp8266 
   WiFi.disconnect();
@@ -53,26 +66,8 @@ bool TeWifi::modeWifiClient() {
 }
 bool TeWifi::checkWifi() {
   if (WiFi.status() == WL_CONNECTED) {
-    // dnsServer.processNextRequest();
-    // WiFi.localIP(); // 0.0.0.0
     return true;
   }
-  int i=0;
-  while  ((WiFi.status() != WL_CONNECTED) && (i<20)) {
-    delay(500); i++;
-  }
-  if (WiFi.status() != WL_CONNECTED) {
-    WiFi.disconnect();
-    i=0;
-    while ((WiFi.status() != WL_DISCONNECTED) && (i<20)) {
-       delay(500); i++;
-    }
-    WiFi.begin(configure->getVariable("wifiSSID").c_str(),  configure->getVariable("wifipassword").c_str());
-    i=0;
-    while ((WiFi.status() != WL_CONNECTED) && (i<20)) {
-       delay(500); i++;
-    }
-  }
-  return (WiFi.status() == WL_CONNECTED);
+  return modeWifiClient();
 }
 
