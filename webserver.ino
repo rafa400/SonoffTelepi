@@ -60,7 +60,7 @@ void  TeWebServer::gotoIndexHTML() {
 
 void TeWebServer::defineWeb() {
 
-  httpServer->on("/", []() {
+  httpServer->on("/json", []() {
     WebS->httpServer->send(200, "text/html",  WebS->jsonPage + " [ { 'Relay1':'" + tewifi->hostname + "' } ]}"  );
   });
   httpServer->on("/on", []() {
@@ -80,6 +80,16 @@ void TeWebServer::defineWeb() {
       WebS->httpServer->send(200, "text/html",  WebS->jsonPage + " [ { 'Relay1':'On' } ]}"  );
     delay(100);
   });
+  httpServer->on("/", []() {
+    String parameters[][2]={
+       {"%time",timeruning()},
+       {"%eso",TelePiVersion}
+    };
+    String index=FPSTR(indexhtml);
+    for(int i=0;i<sizeof(parameters)/sizeof(parameters[0]);i++) index.replace(parameters[i][0],parameters[i][1]);
+    WebS->httpServer->send(200, "text/html", index );
+    delay(100);
+  });
   httpServer->on("/index.html", []() {
     String parameters[][2]={
        {"%time",timeruning()},
@@ -90,6 +100,7 @@ void TeWebServer::defineWeb() {
     WebS->httpServer->send(200, "text/html", index );
     delay(100);
   });
+  
   httpServer->on("/wifisetup.html", []() {
     if ( ! configure->setArgs(*WebS->httpServer) ) {
       WebS->gotoIndexHTML();
@@ -110,7 +121,7 @@ void TeWebServer::defineWeb() {
        {"%4s",configure->getVariable("Wifi_GW")},
        {"%5s",configure->getVariable("Wifi_MSK")},
        {"%6s",configure->getVariable("Wifi_DNS")},
-       {"%time",timeruning()},
+       {"%time",timeruning()+"  "+String(distance)},
        {"%eso",TelePiVersion}
     };
     String wifisetup=FPSTR(wifisetuphtml);
@@ -156,6 +167,21 @@ void TeWebServer::defineWeb() {
     WebS->httpServer->send(200, "text/html",workmode );
     delay(100);
   });
+  httpServer->on("/linkwith.html", []() {
+    if ( ! configure->setArgs(*WebS->httpServer) ) {
+      WebS->gotoIndexHTML();
+      return;
+    }
+    String parameters[][2]={
+       {"%time",timeruning()},
+       {"%eso",TelePiVersion}
+    };    
+    String linkwith=FPSTR(linkwithhtml);
+    for(int i=0;i<sizeof(parameters)/sizeof(parameters[0]);i++) linkwith.replace(parameters[i][0],parameters[i][1]);
+    WebS->httpServer->send(200, "text/html",linkwith );
+    delay(100);
+  });
+  
   httpServer->on("/mqtt.html", []() {
     if ( ! configure->setArgs(*WebS->httpServer) ) {
       WebS->gotoIndexHTML();

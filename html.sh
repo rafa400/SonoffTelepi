@@ -15,6 +15,7 @@ echo 'const char sonoffsvgchar[] PROGMEM = R"=====('"`cat "sonoff.svg"`"')====="
 echo 'const char indexhtml[] PROGMEM = R"=====('"`cat index.html`"')=====";'
 echo 'const char wifisetuphtml[] PROGMEM = R"=====('"`cat wifisetup.html`"')=====";'
 echo 'const char workmodehtml[] PROGMEM = R"=====('"`cat workmode.html`"')=====";'
+echo 'const char linkwithhtml[] PROGMEM = R"=====('"`cat linkwith.html`"')=====";'
 echo 'const char mqtthtml[] PROGMEM = R"=====('"`cat mqtt.html`"')=====";'
 echo 'const char updatehtml[] PROGMEM = R"=====('"`cat update.html`"')=====";'
 
