@@ -44,10 +44,6 @@ TeWifi *tewifi;
 
 TeWebServer *WebS;
 
-#define echoPin D6 // Echo Pin
-#define trigPin D5 // Trigger Pin
-
- 
 // **********************************
 // **       PROGRAM        **
 // **********************************
@@ -209,13 +205,9 @@ void setup(void) {
   } else
     MDNS.addService("http", "tcp", 80);
 */  
-pinMode(trigPin, OUTPUT);
-pinMode(echoPin, INPUT);
-
   initI2C();
+  initDistance();
 }
-
-long duration, distance; // Duration used to calculate distance
 
 void loop(void) {
   WebS->httpServer->handleClient();
@@ -227,17 +219,6 @@ void loop(void) {
    dealwithgpio(GPIO01TX,GPIO12Relay);
   }
   mqttcheck();
-
-digitalWrite(trigPin, LOW);
-delayMicroseconds(2);
-digitalWrite(trigPin, HIGH);
-delayMicroseconds(10);
-digitalWrite(trigPin, LOW);
-duration = pulseIn(echoPin, HIGH);
-distance = duration/58.2;
-
-// scanI2C();
-testI2Cpwm();
 
   ArduinoOTA.handle(); //  Handle OTA server.
   yield();

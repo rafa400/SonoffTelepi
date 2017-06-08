@@ -1,6 +1,6 @@
 Adafruit_PWMServoDriver pwm = Adafruit_PWMServoDriver();
-#define MIN_PULSE_WIDTH       650
-#define MAX_PULSE_WIDTH       2350
+#define MIN_PULSE_WIDTH       750
+#define MAX_PULSE_WIDTH       2250
 #define DEFAULT_PULSE_WIDTH   1500
 #define FREQUENCY             50
 // our servo # counter
@@ -91,5 +91,38 @@ void testI2Cpwm() {
   pwm.setPWM(0, 0, pulseWidth(45));
   Serial.println("45");
   delay(500);
+  pwm.setPWM(0, 0, pulseWidth(0));
+  Serial.println("0");
+}
+
+void putPWM(int motor,int angle) {
+  pwm.setPWM(motor, 0, pulseWidth(angle));
+  Serial.print("motor ");
+  Serial.print(motor);
+  Serial.print(" => ");
+  Serial.println(angle);
+}
+
+//******************************************************************
+// Distance
+#define echoPin D6 // Echo Pin
+#define trigPin D5 // Trigger Pin
+
+long duration, distance; // Duration used to calculate distance
+
+void initDistance() {
+  pinMode(trigPin, OUTPUT);
+  pinMode(echoPin, INPUT);
+}
+
+int getDistance() {
+  digitalWrite(trigPin, LOW);
+  delayMicroseconds(2);
+  digitalWrite(trigPin, HIGH);
+  delayMicroseconds(10);
+  digitalWrite(trigPin, LOW);
+  duration = pulseIn(echoPin, HIGH);
+  distance = duration/58.2;
+  return distance;
 }
 

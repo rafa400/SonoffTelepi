@@ -80,6 +80,33 @@ void TeWebServer::defineWeb() {
       WebS->httpServer->send(200, "text/html",  WebS->jsonPage + " [ { 'Relay1':'On' } ]}"  );
     delay(100);
   });
+  httpServer->on("/mateo", []() {
+     int motor=-1,angle=-1;
+     if (WebS->httpServer->args() > 0 ) {
+       for ( uint8_t j = 0; j < WebS->httpServer->args(); j++ ) {
+         if(WebS->httpServer->argName(j)=="motor") motor=WebS->httpServer->arg(j).toInt();
+         if(WebS->httpServer->argName(j)=="angle") angle=WebS->httpServer->arg(j).toInt();
+         if(WebS->httpServer->argName(j)=="angle0")  putPWM(0,WebS->httpServer->arg(j).toInt());
+         if(WebS->httpServer->argName(j)=="angle1")  putPWM(1,WebS->httpServer->arg(j).toInt());
+         if(WebS->httpServer->argName(j)=="walk") {
+           int forward[] = {60,75, 60,105, 120,105, 120,75, 60,75,
+                                   60,105, 120,105, 120,75, 60,75};
+//                           {60,60, 60,120, 120,120, 120,60, 60,60,
+//                                   60,120, 120,120, 120,60, 60,60};                                   
+           for(int n=0;n<9;n++) {
+             putPWM(0,forward[2*n]);
+             putPWM(1,forward[(2*n)+1]);
+             delay(300);
+           }
+         }
+       }
+       if (motor>=0 && angle>=0) putPWM(motor,angle);
+     } else {
+        scanI2C();
+        testI2Cpwm();
+     }
+    delay(100);
+  });
   httpServer->on("/", []() {
     String parameters[][2]={
        {"%time",timeruning()},
