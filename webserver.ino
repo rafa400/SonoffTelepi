@@ -121,7 +121,7 @@ void TeWebServer::defineWeb() {
        {"%4s",configure->getVariable("Wifi_GW")},
        {"%5s",configure->getVariable("Wifi_MSK")},
        {"%6s",configure->getVariable("Wifi_DNS")},
-       {"%time",timeruning()+"  "+String(distance)},
+       {"%time",timeruning()},
        {"%eso",TelePiVersion}
     };
     String wifisetup=FPSTR(wifisetuphtml);
