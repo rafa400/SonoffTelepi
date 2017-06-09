@@ -19,6 +19,8 @@ const char jsuijs[] PROGMEM = R"=====((function (window, document) {
         content  = document.getElementById('main'),
 
         mybutton = document.getElementById('mybutton');
+        adelante = document.getElementById('adelante');
+        detente  = document.getElementById('detente');
 
     function toggleClass(element, className) {
         var classes = element.className.split(/\s+/),
@@ -66,6 +68,24 @@ const char jsuijs[] PROGMEM = R"=====((function (window, document) {
       }
       client.send();
     };
+    adelante.onclick = function (e) {
+      var client = new XMLHttpRequest();
+      client.open('GET', '/mateo?walk=0');
+      client.onreadystatechange = function() {
+        // alert(client.responseText);
+      }
+      client.send();
+    };
+    detente.onclick = function (e) {
+      var client = new XMLHttpRequest();
+      client.open('GET', '/mateo?stop=0');
+      client.onreadystatechange = function() {
+        // alert(client.responseText);
+      }
+      client.send();
+    };
+
+
 
 }(this, this.document));)=====";
 const char sidemenucss[] PROGMEM = R"=====(body {
@@ -712,6 +732,8 @@ const char indexhtml[] PROGMEM = R"=====(<!doctype html>
          <div class="pure-g">
            <div class="pure-u-1-3">
              <a id="mybutton" class="myButton">ON/OFF</a>
+             <a id="adelante" class="myButton">Adelante</a>
+             <a id="detente" class="myButton">Detente!</a>
            </div>
           <div class="pure-u-2-3">
             <h2>%eso  Uptime: %time</h2>
@@ -1021,7 +1043,7 @@ const char linkwithhtml[] PROGMEM = R"=====(<!doctype html>
               </tr>
           </thead>
           <tbody>
-              <tr>
+              <tr style="display: table-row;">
                 <td>Button<br></td>
                 <td><input type="radio" style="transform: scale(1.5);" name="ext1sw" value="switch" %1a></td>
                 <td><input type="radio" style="transform: scale(1.5);" name="ext1sw" value="push" %1b></td>
@@ -1036,7 +1058,7 @@ const char linkwithhtml[] PROGMEM = R"=====(<!doctype html>
                   </select>
                 </td>
               </tr>
-              <tr>
+              <tr  style="display: table-row;">
                 <td>GPIO14<br></td>
                 <td><input type="radio" style="transform: scale(1.5);" name="ext2sw" value="switch" %2a></td>
                 <td><input type="radio" style="transform: scale(1.5);" name="ext2sw" value="push" %2b></td>
@@ -1051,7 +1073,7 @@ const char linkwithhtml[] PROGMEM = R"=====(<!doctype html>
                   </select>
                 </td>
               </tr>
-              <tr>
+              <tr style="display: table-row;">
                 <td>GPIO01<br></td>
                 <td><input type="radio" style="transform: scale(1.5);" name="ext3sw" value="switch" %3a></td>
                 <td><input type="radio" style="transform: scale(1.5);" name="ext3sw" value="push" %3b></td>
@@ -1065,7 +1087,7 @@ const char linkwithhtml[] PROGMEM = R"=====(<!doctype html>
                     <option value="GPIO03" %3h>GPIO03</option>
                   </select>
                 </td>
-              </tr>
+              </tr style="display: table-row;">
               <tr>
                 <td>GPIO03<br></td>
                 <td><input type="radio" style="transform: scale(1.5);" name="ext4sw" value="switch" %4a></td>

@@ -6,6 +6,8 @@
         content  = document.getElementById('main'),
 
         mybutton = document.getElementById('mybutton');
+        adelante = document.getElementById('adelante');
+        detente  = document.getElementById('detente');
 
     function toggleClass(element, className) {
         var classes = element.className.split(/\s+/),
@@ -53,5 +55,23 @@
       }
       client.send();
     };
+    adelante.onclick = function (e) {
+      var client = new XMLHttpRequest();
+      client.open('GET', '/mateo?walk=0');
+      client.onreadystatechange = function() {
+        // alert(client.responseText);
+      }
+      client.send();
+    };
+    detente.onclick = function (e) {
+      var client = new XMLHttpRequest();
+      client.open('GET', '/mateo?stop=0');
+      client.onreadystatechange = function() {
+        // alert(client.responseText);
+      }
+      client.send();
+    };
+
+
 
 }(this, this.document));

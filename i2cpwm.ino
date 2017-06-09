@@ -126,3 +126,45 @@ int getDistance() {
   return distance;
 }
 
+const int n=8;
+int mov[n*2]={60,60, 60,120, 120,120, 120,60,
+              60,60, 60,120, 120,120, 120,60 };
+int stp[n*2]={90,90, 90,90, 90,90, 90,90,
+              90,90, 90,90, 90,90, 90,90 };
+
+              
+int forward[n*2];
+
+void goahead() {
+      for(int i=0;i<n*2;i++) forward[i]=mov[i];
+}
+void goback() {
+      for(int i=0;i<n*2;i++) forward[i]=mov[n*2-i-1];
+}
+void gostop() {
+      for(int i=0;i<n*2;i++) forward[i]=stp[i];
+}
+
+int n_loop=0;
+int last_millis=millis();
+
+void i2cpwmcheck() {
+   int a=millis();
+   if (a>=last_millis+300) 
+   if (forward[2*n_loop%n]>0) {
+     pinMode(GPIO13Led, OUTPUT);
+     digitalWrite(GPIO13Led, HIGH);
+     pinMode(D8, OUTPUT);
+     digitalWrite(D8, HIGH);
+     putPWM(0,forward[2*n_loop%n]);
+     putPWM(1,forward[(2*n_loop%n)+1]);
+     forward[2*n_loop%n]=0;
+     forward[(2*n_loop%n)+1]=0;
+     last_millis=a;
+     n_loop++;
+   } else {
+     digitalWrite(GPIO13Led, LOW);
+     digitalWrite(D8, LOW);
+   }
+}
+

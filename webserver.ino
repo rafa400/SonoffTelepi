@@ -88,23 +88,16 @@ void TeWebServer::defineWeb() {
          if(WebS->httpServer->argName(j)=="angle") angle=WebS->httpServer->arg(j).toInt();
          if(WebS->httpServer->argName(j)=="angle0")  putPWM(0,WebS->httpServer->arg(j).toInt());
          if(WebS->httpServer->argName(j)=="angle1")  putPWM(1,WebS->httpServer->arg(j).toInt());
-         if(WebS->httpServer->argName(j)=="walk") {
-           int forward[] = {60,75, 60,105, 120,105, 120,75, 60,75,
-                                   60,105, 120,105, 120,75, 60,75};
-//                           {60,60, 60,120, 120,120, 120,60, 60,60,
-//                                   60,120, 120,120, 120,60, 60,60};                                   
-           for(int n=0;n<9;n++) {
-             putPWM(0,forward[2*n]);
-             putPWM(1,forward[(2*n)+1]);
-             delay(300);
-           }
-         }
+         if(WebS->httpServer->argName(j)=="walk") goahead();
+         if(WebS->httpServer->argName(j)=="back") goback();
+         if(WebS->httpServer->argName(j)=="stop") gostop();
        }
        if (motor>=0 && angle>=0) putPWM(motor,angle);
      } else {
         scanI2C();
-        testI2Cpwm();
+//        testI2Cpwm();
      }
+    WebS->httpServer->send(200, "text/html", "O sea, HELLO?" );
     delay(100);
   });
   httpServer->on("/", []() {

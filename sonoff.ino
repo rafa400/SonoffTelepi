@@ -209,6 +209,8 @@ void setup(void) {
   initDistance();
 }
 
+boolean inicio=true;
+
 void loop(void) {
   WebS->httpServer->handleClient();
   if ( bootmode==APDEFAULT) {
@@ -220,8 +222,12 @@ void loop(void) {
   }
   mqttcheck();
 
+  i2cpwmcheck();
+
   ArduinoOTA.handle(); //  Handle OTA server.
   yield();
+
+  if (inicio) {inicio=false; goahead();}
 
 }
 
