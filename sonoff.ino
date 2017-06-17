@@ -133,11 +133,13 @@ bool dealwithgpio(int gpioin,int gpioout) {
        if (gpioP[gpioin]==LOW) {
          if (filter(gpioin, LOW, 50)) {
              if (modew=="IN-R") changeOUT(gpioout);
+             // if el otro then wget
              gpioP[gpioin]=HIGH;
              mqttmessage(gpioin,gpioP[gpioin],"in");
          }
-       } else {  
+       } else {
          if (filter(gpioin, HIGH, 100)) {
+             // if el otro then wget
              gpioP[gpioin]=LOW;
              mqttmessage(gpioin,gpioP[gpioin],"in");
          }
