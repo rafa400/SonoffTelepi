@@ -111,7 +111,7 @@ void TeWebServer::defineWeb() {
        {"%a1s",configure->getVariable("hostname",tewifi->def_hostname)},
        {"%a2s",SELECTEDdef("wifimode","AP","AP")},
        {"%a3s",SELECTED("wifimode","CLI")},
-       {"%a5s",configure->getVariable("wifiSSID","KITIPASA")},
+       {"%a5s",configure->getVariable("wifiSSID","KITIPASAb")},
        {"%a6s",configure->getVariable("wifipassword","<kitipasa>")},
        
 
@@ -173,6 +173,40 @@ void TeWebServer::defineWeb() {
       return;
     }
     String parameters[][2]={
+       {"%1a",CHECKEDdef("ext1sw","switch","switch")},
+       {"%1a",CHECKEDdef("ext1sw","switch","switch")},
+       {"%1b",CHECKED("ext1sw","push")},
+       {"%1c",configure->getVariable("ext1IP")},
+       {"%1d",SELECTEDdef("ext1dest","ext1dest","Disabled")},
+       {"%1e",SELECTED("ext1dest","Relay")},
+       {"%1f",SELECTED("ext1dest","GPIO14")},
+       {"%1g",SELECTED("ext1dest","GPIO01")},
+       {"%1h",SELECTED("ext1dest","GPIO03")},
+       {"%2a",CHECKEDdef("ext2sw","switch","switch")},
+       {"%2b",CHECKED("ext2sw","push")},
+       {"%2c",configure->getVariable("ext2IP")},
+       {"%2d",SELECTEDdef("ext2dest","ext2dest","Disabled")},
+       {"%2e",SELECTED("ext2dest","Relay")},
+       {"%2f",SELECTED("ext2dest","GPIO14")},
+       {"%2g",SELECTED("ext2dest","GPIO01")},
+       {"%2h",SELECTED("ext2dest","GPIO03")},
+       {"%3a",CHECKEDdef("ext3sw","switch","switch")},
+       {"%3b",CHECKED("ext3sw","push")},
+       {"%3c",configure->getVariable("ext3IP")},
+       {"%3d",SELECTEDdef("ext3dest","ext3dest","Disabled")},
+       {"%3e",SELECTED("ext3dest","Relay")},
+       {"%3f",SELECTED("ext3dest","GPIO14")},
+       {"%3g",SELECTED("ext3dest","GPIO01")},
+       {"%3h",SELECTED("ext3dest","GPIO03")},
+       {"%4a",CHECKEDdef("ext4sw","switch","switch")},
+       {"%4b",CHECKED("ext4sw","push")},
+       {"%4c",configure->getVariable("ext4IP")},
+       {"%4d",SELECTEDdef("ext4dest","ext4dest","Disabled")},
+       {"%4e",SELECTED("ext4dest","Relay")},
+       {"%4f",SELECTED("ext4dest","GPIO14")},
+       {"%4g",SELECTED("ext4dest","GPIO01")},
+       {"%4h",SELECTED("ext4dest","GPIO03")},
+
        {"%time",timeruning()},
        {"%eso",TelePiVersion}
     };    

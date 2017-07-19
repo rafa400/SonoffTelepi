@@ -39,7 +39,7 @@ bool Conf::save() {
 bool Conf::savedef() {
   maxv=0;
   getVariable("hostname",HOSTNAME + String(ESP.getChipId(), HEX));
-  getVariable("wifiSSID","KITIPASA");
+  getVariable("wifiSSID","KITIPASAa");
   getVariable("wifipassword","<kitipasa>");
   getVariable("Wifi_IP","192.168.0.20");
   getVariable("Wifi_GW","192.168.0.1");
@@ -57,6 +57,22 @@ bool Conf::savedef() {
   getVariable("gpio01sw","switch");
   getVariable("gpio03","NU");
   getVariable("gpio03sw","switch");
+  getVariable("MQTTServerPath","TelePi/Sonoff");
+  getVariable("ext1sw","switch");
+  getVariable("ext1IP","");
+  getVariable("ext1dest","Disabled");
+  getVariable("ext2sw","switch");
+  getVariable("ext2IP","");
+  getVariable("ext2dest","Disabled");
+  getVariable("ext3sw","switch");
+  getVariable("ext3IP","");
+  getVariable("ext3dest","Disabled");
+  getVariable("ext4sw","switch");
+  getVariable("ext4IP","");
+  getVariable("ext4dest","Disabled");
+  SPIFFS.format();
+  SPIFFS.begin();
+  SPIFFS.end();
   save();
   return true;
 }

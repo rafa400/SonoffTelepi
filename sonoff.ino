@@ -6,6 +6,15 @@
 #include <DNSServer.h>
 #include <ESP8266mDNS.h>
 #include <TimeAlarms.h>
+#include <ESP8266Ping.h>
+
+#include <ESP8266HTTPClient.h>
+
+// Cayenne authentication info. This should be obtained from the Cayenne Dashboard.
+//#include <CayenneMQTTESP8266.h>
+char username[] = "28fa65c0-f8d5-11e6-a317-afbb545bf4f0";
+char password[] = "faba8957ef391a95bb26e446a218f068bcb83e67";
+char clientID[] = "4de98a90-68c0-11e7-80f0-a334be42512c";
 
 /* //https://github.com/milesburton/Arduino-Temperature-Control-Library
  * // Tambien hay que instalar la libreria de OneWire desde el IDE de Arduino
@@ -28,7 +37,7 @@ DeviceAddress insideThermometer;
    @brief mDNS and OTA Constants
    @{
 */
-#define TelePiVersion "Ver: 3.0"
+#define TelePiVersion "Ver: 3.1"
 /// @}
 
 #define max_variable 150  // Max variable length 
@@ -123,6 +132,39 @@ bool changeOUT_OFF(int gpioout) {
          return true;
 }
 
+
+bool extcall(int gpioin,int gpioout,String ip) {
+  if (Ping.ping(TeWifi::parseIP(ip))) {
+    HTTPClient client;
+    // on, off, change
+    client.begin("http://"+ip+"/change");
+    int httpCode = client.GET();
+    if(httpCode > 0) {
+        if(httpCode == HTTP_CODE_OK) {
+            String payload = client.getString();
+        }
+    } else {
+         //   client.errorToString(httpCode).c_str();
+    }
+    client.end();    
+  }
+  return true;
+}
+bool dealwithexternal(int gpioin,int gpioout) {
+   return true;
+   if (WiFi.status() == WL_CONNECTED) {
+      switch (gpioin) {
+        case GPIO00Button: if (configure->getVariable("ext1IP")!="") extcall(gpioin,gpioout,configure->getVariable("ext1IP")); break;
+        case GPIO01TX:     if (configure->getVariable("ext2IP")!="") extcall(gpioin,gpioout,configure->getVariable("ext2IP")); break;
+        case GPIO03RX:     if (configure->getVariable("ext3IP")!="") extcall(gpioin,gpioout,configure->getVariable("ext3IP")); break;
+        case GPIO14Pin:    if (configure->getVariable("ext4IP")!="") extcall(gpioin,gpioout,configure->getVariable("ext4IP")); break;
+        default: ;
+      }
+   } else
+      return false;
+   return true;
+}
+
 bool dealwithgpio(int gpioin,int gpioout) {
    String gpiotxt=(gpioin<10?"gpio0":"gpio")+String(gpioin);
    String modew=configure->getVariable(gpiotxt);
@@ -136,12 +178,14 @@ bool dealwithgpio(int gpioin,int gpioout) {
              // if el otro then wget
              gpioP[gpioin]=HIGH;
              mqttmessage(gpioin,gpioP[gpioin],"in");
+             dealwithexternal(gpioin,gpioout);
          }
        } else {
          if (filter(gpioin, HIGH, 100)) {
              // if el otro then wget
              gpioP[gpioin]=LOW;
              mqttmessage(gpioin,gpioP[gpioin],"in");
+             dealwithexternal(gpioin,gpioout);
          }
        }
      }
@@ -150,6 +194,7 @@ bool dealwithgpio(int gpioin,int gpioout) {
            gpioI[gpioin]= (gpioI[gpioin]==LOW?HIGH:LOW);
            if (modew=="IN-R") changeOUT(gpioout);
            mqttmessage(gpioin,gpioI[gpioin],"in");
+           dealwithexternal(gpioin,gpioout);
        }
      }
    }
@@ -176,6 +221,7 @@ void setup(void) {
     if (filter(GPIO00Button, LOW, 700)) { //Check if button is HIGH for ~700ms
       blink(GPIO13Led, 250, 16);
       configure->savedef();  // Make a factory reset
+      blink(GPIO13Led, 250, 16);
     }
     tewifi->modeAndroidApp(); bootmode=APSMARTCONF;
   } else {
@@ -206,7 +252,12 @@ void setup(void) {
   } else
     MDNS.addService("http", "tcp", 80);
 */  
+
+//  Cayenne.begin(username, password, clientID);
+
 }
+
+//unsigned long lastMillis = 0;
 
 void loop(void) {
   WebS->httpServer->handleClient();
@@ -218,9 +269,27 @@ void loop(void) {
    dealwithgpio(GPIO01TX,GPIO12Relay);
   }
   mqttcheck();
-
+/*
+  Cayenne.loop();
+  if (millis() - lastMillis > 10000) {
+    lastMillis = millis();
+    //Write data to Cayenne here. This example just sends the current uptime in milliseconds.
+    Cayenne.virtualWrite(0, lastMillis);
+    //Some examples of other functions you can use to send data.
+    //Cayenne.celsiusWrite(1, 22.0);
+    //Cayenne.luxWrite(2, 700);
+    //Cayenne.virtualWrite(3, 50, TYPE_PROXIMITY, UNIT_CENTIMETER);
+  }
+*/
   ArduinoOTA.handle(); //  Handle OTA server.
   yield();
 
 }
+/*
+CAYENNE_IN_DEFAULT()
+{
+  CAYENNE_LOG("CAYENNE_IN_DEFAULT(%u) - %s, %s", request.channel, getValue.getId(), getValue.asString());
+  //Process message here. If there is an error set an error message using getValue.setError(), e.g getValue.setError("Error message");
+}
+*/
 
