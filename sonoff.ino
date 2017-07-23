@@ -10,11 +10,19 @@
 
 #include <ESP8266HTTPClient.h>
 
+#include <IFTTTMaker.h>
+
 // Cayenne authentication info. This should be obtained from the Cayenne Dashboard.
 //#include <CayenneMQTTESP8266.h>
-char username[] = "28fa65c0-f8d5-11e6-a317-afbb545bf4f0";
-char password[] = "faba8957ef391a95bb26e446a218f068bcb83e67";
-char clientID[] = "4de98a90-68c0-11e7-80f0-a334be42512c";
+char username[] = "";
+char password[] = "";
+char clientID[] = "";
+
+#define KEY "cXemO-NnaCutwlu8s4c-kb"
+#define EVENT_NAME "device_on"
+//WiFiClientSecure client; //For ESP8266 boards
+//IFTTTMaker ifttt(KEY, client);
+
 
 /* //https://github.com/milesburton/Arduino-Temperature-Control-Library
  * // Tambien hay que instalar la libreria de OneWire desde el IDE de Arduino
@@ -116,6 +124,7 @@ bool changeOUT_ON(int gpioout) {
             delay(500);
             digitalWrite(GPIO13Led, HIGH);
          }
+//         ifttt.triggerEvent(EVENT_NAME, "HOLA", "KASE");
          return true;
 }
 bool changeOUT_OFF(int gpioout) {

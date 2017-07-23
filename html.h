@@ -57,7 +57,7 @@ const char jsuijs[] PROGMEM = R"=====((function (window, document) {
             toggleAll(e);
         }
     };
-
+    if (mybutton !== null )
     mybutton.onclick = function (e) {
       var client = new XMLHttpRequest();
       client.open('GET', '/change');
