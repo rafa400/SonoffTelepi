@@ -11,11 +11,11 @@
 #include <ESP8266HTTPClient.h>
 
 #include "version.h"
-#ifdef DEBUG_ESP_PORT
-#define DEBUG_MSG(...) DEBUG_ESP_PORT.printf( __VA_ARGS__ )
-#else
-#define DEBUG_MSG(...)
-#endif
+//#ifdef DEBUG_ESP_PORT
+//#define DEBUG_MSG(...) DEBUG_ESP_PORT.printf( __VA_ARGS__ )
+//#else
+//#define DEBUG_MSG(...)
+//#endif
 
 //WiFiClientSecure client=WiFiClientSecure(); //For ESP8266 boards
 
@@ -256,9 +256,9 @@ void setup(void) {
     MDNS.addService("http", "tcp", 80);
 */  
 
-  Serial.begin(115200);
-   delay(3000);
-   DEBUG_MSG("bootup RAFA...\n");
+//   Serial.begin(115200);
+//   delay(3000);
+//   DEBUG_MSG("bootup RAFA...\n");
 
   if (configure->getVariable("IFTTTenabled")=="on") {
     String requestResult;

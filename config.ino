@@ -102,7 +102,6 @@ void Conf::addConfig(String varname, String varval) {
   myvar[maxv].variable[0]=0; myvar[maxv].value[0]=0;
   if (varname!=NULL && varname!="") strcpy(myvar[maxv].variable,varname.c_str());
   if (varval!=NULL && varval!="")  strcpy(myvar[maxv].value,varval.c_str());
-  DEBUG_ESP_PORT.printf("ADD:%s--%s\n",myvar[maxv].variable,myvar[maxv].value);
   maxv++;
 }
 String Conf::getFirstVar(String &text, String separator) {
@@ -142,7 +141,6 @@ String Conf::setVariable(String varname,String defval) {
          {myvar[i].value[0]=0;myvar[i].value[1]=0;}
        else
          strcpy(myvar[i].value,defval.c_str());
-       DEBUG_ESP_PORT.printf("VAR:%s--%s\n",myvar[i].variable,myvar[i].value);
        return defval;
     }
     i++;
