@@ -1,4 +1,5 @@
 #include "webserver.h"
+#include "version.h"
 
 String timeruning(){
   int sec = millis() / 1000;
@@ -83,7 +84,7 @@ void TeWebServer::defineWeb() {
   httpServer->on("/", []() {
     String parameters[][2]={
        {"%time",timeruning()},
-       {"%eso",TelePiVersion}
+       {"%eso",String(TelePiVersion)+" "+TimestampedVersion}
     };
     String index=FPSTR(indexhtml);
     for(int i=0;i<sizeof(parameters)/sizeof(parameters[0]);i++) index.replace(parameters[i][0],parameters[i][1]);
@@ -93,7 +94,7 @@ void TeWebServer::defineWeb() {
   httpServer->on("/index.html", []() {
     String parameters[][2]={
        {"%time",timeruning()},
-       {"%eso",TelePiVersion}
+       {"%eso",String(TelePiVersion)+" "+TimestampedVersion}
     };
     String index=FPSTR(indexhtml);
     for(int i=0;i<sizeof(parameters)/sizeof(parameters[0]);i++) index.replace(parameters[i][0],parameters[i][1]);
@@ -122,7 +123,7 @@ void TeWebServer::defineWeb() {
        {"%5s",configure->getVariable("Wifi_MSK")},
        {"%6s",configure->getVariable("Wifi_DNS")},
        {"%time",timeruning()},
-       {"%eso",TelePiVersion}
+       {"%eso",String(TelePiVersion)+" "+TimestampedVersion}
     };
     String wifisetup=FPSTR(wifisetuphtml);
     for(int i=0;i<sizeof(parameters)/sizeof(parameters[0]);i++) wifisetup.replace(parameters[i][0],parameters[i][1]);
@@ -160,7 +161,7 @@ void TeWebServer::defineWeb() {
        {"%16",CHECKEDdef("gpio03sw","switch","switch")},
        {"%17",CHECKED("gpio03sw","push")},
        {"%time",timeruning()},
-       {"%eso",TelePiVersion}
+       {"%eso",String(TelePiVersion)+" "+TimestampedVersion}
     };    
     String workmode=FPSTR(workmodehtml);
     for(int i=0;i<sizeof(parameters)/sizeof(parameters[0]);i++) workmode.replace(parameters[i][0],parameters[i][1]);
@@ -208,7 +209,7 @@ void TeWebServer::defineWeb() {
        {"%4h",SELECTED("ext4dest","GPIO03")},
 
        {"%time",timeruning()},
-       {"%eso",TelePiVersion}
+       {"%eso",String(TelePiVersion)+" "+TimestampedVersion}
     };    
     String linkwith=FPSTR(linkwithhtml);
     for(int i=0;i<sizeof(parameters)/sizeof(parameters[0]);i++) linkwith.replace(parameters[i][0],parameters[i][1]);
@@ -229,8 +230,11 @@ void TeWebServer::defineWeb() {
        {"%2s",configure->getVariable("MQTT_IP","192.168.0.1")},
        {"%3s",configure->getVariable("MQTT_Port","1883")},
        {"%4s",configure->getVariable("MQTTpassword","telepi")},
+       {"%5s",CHECKED("IFTTTenabled","on")},
+       {"%6s",configure->getVariable("IFTTTevent","")},
+       {"%7s",configure->getVariable("IFTTTkey","")},
        {"%time",timeruning()},
-       {"%eso",TelePiVersion}
+       {"%eso",String(TelePiVersion)+" "+TimestampedVersion}
     };    
     String mqttmode=FPSTR(mqtthtml);
     for(int i=0;i<sizeof(parameters)/sizeof(parameters[0]);i++) mqttmode.replace(parameters[i][0],parameters[i][1]);
@@ -242,7 +246,7 @@ void TeWebServer::defineWeb() {
   httpServer->on("/update.html", []() {
     String parameters[][2]={
        {"%time",timeruning()},
-       {"%eso",TelePiVersion}
+       {"%eso",String(TelePiVersion)+" "+String(TimestampedVersion)}
     };
     String updates=FPSTR(updatehtml);
     for(int i=0;i<sizeof(parameters)/sizeof(parameters[0]);i++) updates.replace(parameters[i][0],parameters[i][1]);

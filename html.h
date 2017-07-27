@@ -1142,7 +1142,7 @@ const char mqtthtml[] PROGMEM = R"=====(<!doctype html>
           </div>
           <div class="pure-control-group">
             <label for="hostname">Topic</label>
-            <input type="text" name="MQTTServerPath" placeholder="/TelePi/Sonoff" value="%1s" maxlength="39">
+            <input type="text" name="MQTTServerPath" placeholder="TelePi/Sonoff" value="%1s" maxlength="39">
           </div>
           <div class="pure-control-group">
             <label for="hostname">Broker IP</label>
@@ -1157,6 +1157,22 @@ const char mqtthtml[] PROGMEM = R"=====(<!doctype html>
             <input type="text" name="MQTTpassword" placeholder="password" value="%4s" maxlength="30">
           </div>
         </fieldset>
+        <fieldset>
+           <legend>IFTTT Configuration</legend>
+         <div class="pure-control-group">
+           <label for="hostname">Enable IFTTT</label>
+           <input type="hidden" name="IFTTTenabled" value="off">
+           <input type="checkbox"  style="transform: scale(1.5);" name="IFTTTenabled" %5s>
+         </div>
+         <div class="pure-control-group">
+           <label for="hostname">EventName</label>
+           <input type="text" name="IFTTTevent" placeholder="eventname" value="%6s" maxlength="39">
+         </div>
+         <div class="pure-control-group">
+           <label for="hostname">Key</label>
+           <input type="text" name="IFTTTkey" placeholder="xx" value="%7s" maxlength="39">
+         </div>
+       </fieldset>
         <fieldset>  <legend></legend>
           <button class="pure-button pure-button-primary" name="save" value="Save">Accept</button>
           <button class="pure-button pure-button-primary" onclick="window.location.href='index.html'" >Cancel</button>
