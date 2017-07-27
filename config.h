@@ -9,8 +9,8 @@
 // **       Config management        **
 // ************************************
 
-#define pair_max 50  // Max number of variables
-#define l_max 40     // Max length of variables
+#define pair_max 60  // Max number of variables
+#define l_max 40     // Max variable length
 
 struct pair {
    char variable[l_max+1];

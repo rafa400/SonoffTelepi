@@ -10,19 +10,14 @@
 
 #include <ESP8266HTTPClient.h>
 
-#include <IFTTTMaker.h>
+#include "version.h"
+#ifdef DEBUG_ESP_PORT
+#define DEBUG_MSG(...) DEBUG_ESP_PORT.printf( __VA_ARGS__ )
+#else
+#define DEBUG_MSG(...)
+#endif
 
-// Cayenne authentication info. This should be obtained from the Cayenne Dashboard.
-//#include <CayenneMQTTESP8266.h>
-char username[] = "";
-char password[] = "";
-char clientID[] = "";
-
-#define KEY "cXemO-NnaCutwlu8s4c-kb"
-#define EVENT_NAME "device_on"
-//WiFiClientSecure client; //For ESP8266 boards
-//IFTTTMaker ifttt(KEY, client);
-
+//WiFiClientSecure client=WiFiClientSecure(); //For ESP8266 boards
 
 /* //https://github.com/milesburton/Arduino-Temperature-Control-Library
  * // Tambien hay que instalar la libreria de OneWire desde el IDE de Arduino
@@ -124,7 +119,6 @@ bool changeOUT_ON(int gpioout) {
             delay(500);
             digitalWrite(GPIO13Led, HIGH);
          }
-//         ifttt.triggerEvent(EVENT_NAME, "HOLA", "KASE");
          return true;
 }
 bool changeOUT_OFF(int gpioout) {
@@ -255,14 +249,26 @@ void setup(void) {
 
   Alarm.timerOnce(300, tewifi->checkWifi);        // called once after 5min
 
-/*
+  /*
   if (!MDNS.begin(configure->getVariable("hostname").c_str())) {
     while(1) delay(1000);
   } else
     MDNS.addService("http", "tcp", 80);
 */  
 
-//  Cayenne.begin(username, password, clientID);
+  Serial.begin(115200);
+   delay(3000);
+   DEBUG_MSG("bootup RAFA...\n");
+
+  if (configure->getVariable("IFTTTenabled")=="on") {
+    String requestResult;
+    String completeURI = "https://maker.ifttt.com/trigger/"+configure->getVariable("IFTTTevent")+"/with/key/"+configure->getVariable("IFTTTkey");
+  //send HTTP request
+    HTTPClient http;
+    http.begin(completeURI);
+    requestResult = http.GET();
+    http.end();
+  }
 
 }
 
@@ -278,27 +284,9 @@ void loop(void) {
    dealwithgpio(GPIO01TX,GPIO12Relay);
   }
   mqttcheck();
-/*
-  Cayenne.loop();
-  if (millis() - lastMillis > 10000) {
-    lastMillis = millis();
-    //Write data to Cayenne here. This example just sends the current uptime in milliseconds.
-    Cayenne.virtualWrite(0, lastMillis);
-    //Some examples of other functions you can use to send data.
-    //Cayenne.celsiusWrite(1, 22.0);
-    //Cayenne.luxWrite(2, 700);
-    //Cayenne.virtualWrite(3, 50, TYPE_PROXIMITY, UNIT_CENTIMETER);
-  }
-*/
+
   ArduinoOTA.handle(); //  Handle OTA server.
   yield();
 
 }
-/*
-CAYENNE_IN_DEFAULT()
-{
-  CAYENNE_LOG("CAYENNE_IN_DEFAULT(%u) - %s, %s", request.channel, getValue.getId(), getValue.asString());
-  //Process message here. If there is an error set an error message using getValue.setError(), e.g getValue.setError("Error message");
-}
-*/
 

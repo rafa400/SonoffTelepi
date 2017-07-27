@@ -17,7 +17,7 @@ bool Conf::load() {
     myvar[maxv].variable[n1]=0;
     n2=configFile.readBytesUntil('\n',myvar[maxv].value,l_max);
     myvar[maxv].value[n2]=0;
-    if (n1>0 && n2>0)  maxv++;
+    if (n1>0 && n2>0)  maxv++;  // Will not load if value is empty
   }
   configFile.close();
   SPIFFS.end();
@@ -57,7 +57,14 @@ bool Conf::savedef() {
   getVariable("gpio01sw","switch");
   getVariable("gpio03","NU");
   getVariable("gpio03sw","switch");
+  getVariable("MQTTenabled","off");
   getVariable("MQTTServerPath","TelePi/Sonoff");
+  getVariable("MQTT_IP","192.168.0.1");
+  getVariable("MQTT_Port","1883");
+  getVariable("MQTTpassword","telepi");
+  getVariable("IFTTTenabled","off");
+  getVariable("IFTTTevent","");
+  getVariable("IFTTTkey","");
   getVariable("ext1sw","switch");
   getVariable("ext1IP","");
   getVariable("ext1dest","Disabled");
@@ -92,8 +99,10 @@ String Conf::readConfig() {
 }
 
 void Conf::addConfig(String varname, String varval) {
-  strcpy(myvar[maxv].variable,varname.c_str());
-  strcpy(myvar[maxv].value,varval.c_str());
+  myvar[maxv].variable[0]=0; myvar[maxv].value[0]=0;
+  if (varname!=NULL && varname!="") strcpy(myvar[maxv].variable,varname.c_str());
+  if (varval!=NULL && varval!="")  strcpy(myvar[maxv].value,varval.c_str());
+  DEBUG_ESP_PORT.printf("ADD:%s--%s\n",myvar[maxv].variable,myvar[maxv].value);
   maxv++;
 }
 String Conf::getFirstVar(String &text, String separator) {
@@ -106,9 +115,12 @@ String Conf::getFirstVar(String &text, String separator) {
   return first;
 }
 String Conf::getVariable(String varname,String defval) {
-  String res=getVariable(varname);
-  if (res=="") addConfig(varname,defval);
-  else return res;
+  int i=0;  
+  while (i<maxv) {
+    if (varname==String(myvar[i].variable)) return String(myvar[i].value);
+    i++;
+  }
+  addConfig(varname,defval);
   return defval;
 }
 String Conf::getVariable(String varname) {
@@ -122,8 +134,15 @@ String Conf::getVariable(String varname) {
 String Conf::setVariable(String varname,String defval) {
   int i=0;
   while (i<maxv) {
-    if (varname==String(myvar[i].variable)) {
-       strcpy(myvar[i].value,defval.c_str());
+    String kk=String(myvar[i].variable);
+    varname.trim();
+    defval.trim();
+    if (varname==kk) {
+       if ((defval==NULL) || (defval==""))
+         {myvar[i].value[0]=0;myvar[i].value[1]=0;}
+       else
+         strcpy(myvar[i].value,defval.c_str());
+       DEBUG_ESP_PORT.printf("VAR:%s--%s\n",myvar[i].variable,myvar[i].value);
        return defval;
     }
     i++;
@@ -153,16 +172,19 @@ void Conf::setUserPassword(String user,String password){
   setVariable("user_"+user,String(md5str));
 }
 bool Conf::setArgs(ESP8266WebServer &WebServer) {
-  String content = " ";  // Meter un espacio en blanco en sprintf cuelga!!
+  //String content = " ";  // Meter un espacio en blanco en sprintf cuelga!!
   if (WebServer.args() > 0 ) {
     for ( uint8_t j = 0; j < WebServer.args(); j++ ) {
       if(WebServer.argName(j)=="cancel") return false;
       if(WebServer.argName(j)=="save") {
         if (WebServer.args() > 0 ) {
-          for ( uint8_t i = 0; i < WebServer.args(); i++ ) {
-              content = content + "\r\n" + WebServer.argName(i) + "--" + WebServer.arg(i);
+          uint8_t i;
+          for ( i = 0; i < WebServer.args(); i++ ) {
+              //content = content + "\r\n" + WebServer.argName(i) + "--" + WebServer.arg(i);
               setVariable(WebServer.argName(i),WebServer.arg(i));
           }
+          setVariable("count",String(i));
+          setVariable("maxv",String(maxv));
           setUserPassword("admin","admin");
           save();
           return true;
