@@ -19,8 +19,9 @@
 
 //WiFiClientSecure client=WiFiClientSecure(); //For ESP8266 boards
 
-/* //https://github.com/milesburton/Arduino-Temperature-Control-Library
- * // Tambien hay que instalar la libreria de OneWire desde el IDE de Arduino
+//https://github.com/milesburton/Arduino-Temperature-Control-Library
+// Tambien hay que instalar la libreria de OneWire desde el IDE de Arduino
+
 #include <OneWire.h>
 #include "DallasTemperature.h"
 
@@ -28,11 +29,24 @@
 // Setup a oneWire instance to communicate with any OneWire devices (not just Maxim/Dallas temperature ICs)
 OneWire oneWire(ONE_WIRE_BUS);
 // Pass our oneWire reference to Dallas Temperature. 
-DallasTemperature sensors(&oneWire);
+//DallasTemperature sensors(&oneWire);
 // arrays to hold device address
-DeviceAddress insideThermometer;
-......
-*/
+//DeviceAddress insideThermometer;
+
+
+int findDevices()
+{
+  uint8_t address[8];
+  int count = 0;
+
+  if (oneWire.search(address))  {
+    do {
+      count++;
+    } while (oneWire.search(address));
+  }
+
+  return count;
+}
 
 /*
 
@@ -64,7 +78,7 @@ const int GPIO01TX = 1;
 const int GPIO03RX = 3;
 const int GPIO12Relay = 12;
 const int GPIO13Led = 13;
-const int GPIO14Pin = 14;
+const int GPIO14Pin = 15;
 
 int buttonState = HIGH;
 int buttonStateOld = HIGH;
@@ -269,6 +283,9 @@ void setup(void) {
     requestResult = http.GET();
     http.end();
   }
+
+  configure->setVariable("1Wire",String(findDevices()));
+
 
 }
 
