@@ -40,7 +40,7 @@ bool Conf::savedef() {
   maxv=0;
   getVariable("hostname",HOSTNAME + String(ESP.getChipId(), HEX));
   getVariable("wifiSSID","KITIPASAa");
-  getVariable("wifipassword","<kitipasa>");
+  getVariable("wifipassword","kitipasa");
   getVariable("Wifi_IP","192.168.0.20");
   getVariable("Wifi_GW","192.168.0.1");
   getVariable("Wifi_MSK","255.255.255.0");

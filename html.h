@@ -702,7 +702,7 @@ const char indexhtml[] PROGMEM = R"=====(<!doctype html>
               <li class="pure-menu-item"><a href="wifisetup.html" class="pure-menu-link">Wifi Setup</a></li>
               <li class="pure-menu-item"><a href="workmode.html" class="pure-menu-link">Work Mode</a></li>
               <li class="pure-menu-item"><a href="linkwith.html" class="pure-menu-link">Link With</a></li>
-              <li class="pure-menu-item"><a href="mqtt.html" class="pure-menu-link">MQTT Update</a></li>
+              <li class="pure-menu-item"><a href="mqtt.html" class="pure-menu-link">MQTT, IFTTT</a></li>
               <li class="pure-menu-item"><a href="update.html" class="pure-menu-link">Firmware Update</a></li>
             </ul>
         </div>
@@ -754,7 +754,7 @@ const char wifisetuphtml[] PROGMEM = R"=====(<!doctype html>
               <li class="pure-menu-selected"><a href="wifisetup.html" class="pure-menu-link">Wifi Setup</a></li>
               <li class="pure-menu-item"><a href="workmode.html" class="pure-menu-link">Work Mode</a></li>
               <li class="pure-menu-item"><a href="linkwith.html" class="pure-menu-link">Link With</a></li>
-              <li class="pure-menu-item"><a href="mqtt.html" class="pure-menu-link">MQTT Update</a></li>
+              <li class="pure-menu-item"><a href="mqtt.html" class="pure-menu-link">MQTT, IFTTT</a></li>
               <li class="pure-menu-item"><a href="update.html" class="pure-menu-link">Firmware Update</a></li>
             </ul>
         </div>
@@ -855,7 +855,7 @@ const char workmodehtml[] PROGMEM = R"=====(<!doctype html>
               <li class="pure-menu-item"><a href="wifisetup.html" class="pure-menu-link">Wifi Setup</a></li>
               <li class="pure-menu-selected"><a href="workmode.html" class="pure-menu-link">Work Mode</a></li>
               <li class="pure-menu-item"><a href="linkwith.html" class="pure-menu-link">Link With</a></li>
-              <li class="pure-menu-item"><a href="mqtt.html" class="pure-menu-link">MQTT Update</a></li>
+              <li class="pure-menu-item"><a href="mqtt.html" class="pure-menu-link">MQTT, IFTTT</a></li>
               <li class="pure-menu-item"><a href="update.html" class="pure-menu-link">Firmware Update</a></li>
             </ul>
         </div>
@@ -989,12 +989,12 @@ const char linkwithhtml[] PROGMEM = R"=====(<!doctype html>
 
     <div id="menu">
         <div class="pure-menu">
-            <a class="pure-menu-heading" href="index.html">TelePi</a>
+            <a class="pure-menu-heading" href="index.html">%title</a>
             <ul class="pure-menu-list">
               <li class="pure-menu-item"><a href="wifisetup.html" class="pure-menu-link">Wifi Setup</a></li>
               <li class="pure-menu-item"><a href="workmode.html" class="pure-menu-link">Work Mode</a></li>
               <li class="pure-menu-selected"><a href="linkwith.html" class="pure-menu-link">Link With</a></li>
-              <li class="pure-menu-item"><a href="mqtt.html" class="pure-menu-link">MQTT Update</a></li>
+              <li class="pure-menu-item"><a href="mqtt.html" class="pure-menu-link">MQTT, IFTTT</a></li>
               <li class="pure-menu-item"><a href="update.html" class="pure-menu-link">Firmware Update</a></li>
             </ul>
         </div>
@@ -1121,7 +1121,7 @@ const char mqtthtml[] PROGMEM = R"=====(<!doctype html>
               <li class="pure-menu-item"><a href="wifisetup.html" class="pure-menu-link">Wifi Setup</a></li>
               <li class="pure-menu-item"><a href="workmode.html" class="pure-menu-link">Work Mode</a></li>
               <li class="pure-menu-item"><a href="linkwith.html" class="pure-menu-link">Link With</a></li>
-              <li class="pure-menu-selected"><a href="mqtt.html" class="pure-menu-link">MQTT Update</a></li>
+              <li class="pure-menu-selected"><a href="mqtt.html" class="pure-menu-link">MQTT, IFTTTT</a></li>
               <li class="pure-menu-item"><a href="update.html" class="pure-menu-link">Firmware Update</a></li>
             </ul>
         </div>
@@ -1212,7 +1212,7 @@ const char updatehtml[] PROGMEM = R"=====(<!doctype html>
               <li class="pure-menu-item"><a href="wifisetup.html" class="pure-menu-link">Wifi Setup</a></li>
               <li class="pure-menu-item"><a href="workmode.html" class="pure-menu-link">Work Mode</a></li>
               <li class="pure-menu-item"><a href="linkwith.html" class="pure-menu-link">Link With</a></li>
-              <li class="pure-menu-item"><a href="mqtt.html" class="pure-menu-link">MQTT Update</a></li>
+              <li class="pure-menu-item"><a href="mqtt.html" class="pure-menu-link">MQTT, IFTTT</a></li>
               <li class="pure-menu-selected"><a href="update.html" class="pure-menu-link">Firmware Update</a></li>
             </ul>
         </div>
@@ -1227,7 +1227,7 @@ const char updatehtml[] PROGMEM = R"=====(<!doctype html>
          <iframe src="update"  width="100%"></iframe>
       </div>
       <div class="content">
-           <legend>Update Frimware</legend>
+           <legend>Config DATA</legend>
         <iframe src="config.txt"  width="100%"></iframe>
      </div>
     </div>
