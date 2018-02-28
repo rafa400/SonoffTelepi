@@ -6,9 +6,24 @@ String wassubscribed="";
 void mqttmessage(int gpio,int value,String mytype) {
     if (mqttClient.connected()) {
       String pubString = (String(value)=="0"?"OFF":"ON");
-      String topicString = configure->getVariable("MQTTServerPath")+(mytype=="Relay"?"":mytype+"/")+configure->getVariable("hostname")+(String(gpio)=="12"?"":"/"+String(gpio));
+      String topicString = configure->getVariable("MQTTServerPath")+(mytype=="Relay"?"light/":mytype+"/")+configure->getVariable("hostname")+(String(gpio)=="12"?"":"_"+String(gpio))+"/status" ;
       mqttClient.publish(topicString.c_str(), pubString.c_str());
     }
+}
+
+void mqttconfig(int gpio,String mytype) {
+    if (mqttClient.connected()) {
+      String thename=configure->getVariable("hostname")+(String(gpio)=="12"?"":"_"+String(gpio));
+      String topicString = configure->getVariable("MQTTServerPath")+(mytype=="Relay"?"light/":mytype+"/")+thename ;
+      String pubString = "{'name': '"+thename+"', 'platform':'mqtt_json', 'state_topic':'"+topicString+"status', 'command_topic':'"+topicString+"set'}";      
+      topicString=topicString+"/config";
+      mqttClient.publish(topicString.c_str(), pubString.c_str());
+    } else {
+      String a="HOLA";
+      String b="ADIOS";
+      mqttClient.publish(a.c_str(), b.c_str());
+    }
+    
 }
 
 void mqtton(){
@@ -18,7 +33,21 @@ void mqtton(){
       String subscribeme=configure->getVariable("MQTTServerPath")+"DEBUG/"+configure->getVariable("hostname")+"/BootIP";
       IPAddress ip=WiFi.localIP();
       String myip=String(ip[0])+"."+String(ip[1])+"."+String(ip[2])+"."+String(ip[3]);
-      mqttClient.publish(subscribeme.c_str(), myip.c_str());
+      //mqttconfig(GPIO12Relay,"Relay");
+      String thename=configure->getVariable("hostname");
+      thename=(thename==NULL?"HOLA":thename);
+      
+      String topicString = configure->getVariable("MQTTServerPath")+"light/"+thename;
+//      String pubString = "{'name': '"+thename+"', 'platform':'mqtt_json', 'state_topic':'"+topicString+"/status', 'command_topic':'"+topicString+"/set'}";      
+      
+      String pubString = "{\"name\": \""+thename+"\", \"platform\":\"mqtt_json\",\"state_topic\":\"elpla/ESP/status\",\"command_topic\":\"elpla/ESP/status/set\"}";      
+      String a="HOLA";
+      String b="ADIOS";
+      topicString=topicString+"/config";
+      
+      mqttClient.publish(topicString.c_str(), b.c_str());
+      mqttClient.publish(a.c_str(), pubString.c_str());
+      mqttClient.publish(subscribeme.c_str(), myip.c_str());      
     }
 }
 

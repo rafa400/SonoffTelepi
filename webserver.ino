@@ -18,7 +18,7 @@ TeWebServer::TeWebServer(int port) {
   mdns = new MDNSResponder; //ESP8266mDNS;
   mdns->begin("esp8266", WiFi.localIP());
   //co=NULL;
-  jsonPage = "{ 'status':'success', 'count': 1, 'type':'Sonoff TelePi', 'time':'', 'hostname':'OpenWrt2', 'results':";
+  jsonPage = "{ 'status':'success', 'count': 1, 'type':'Sonoff TelePi', 'time':'', 'hostname':'"+configure->getVariable("hostname",tewifi->def_hostname)+"', 'results':";
   httpServer = new ESP8266WebServer(port);
   httpUpdater = new ESP8266HTTPUpdateServer;
   mdns->addService("http", "tcp", 80); 
@@ -62,7 +62,7 @@ void  TeWebServer::gotoIndexHTML() {
 void TeWebServer::defineWeb() {
 
   httpServer->on("/json", []() {
-    WebS->httpServer->send(200, "text/html",  WebS->jsonPage + " [ { 'Relay1':'" + tewifi->hostname + "' } ]}"  );
+    WebS->httpServer->send(200, "text/html",  "{ 'GPIO01':'ON','GPIO02':'ON','GPIO12':'ON','GPIO13':'ON','GPIO14':'ON'}"  );
   });
   httpServer->on("/on", []() {
     WebS->httpServer->send(200, "text/html",  WebS->jsonPage + " [ { 'Relay1':'On' } ]}"  );

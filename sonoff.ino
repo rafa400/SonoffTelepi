@@ -22,6 +22,7 @@
 //https://github.com/milesburton/Arduino-Temperature-Control-Library
 // Tambien hay que instalar la libreria de OneWire desde el IDE de Arduino
 
+/*
 #include <OneWire.h>
 #include "DallasTemperature.h"
 
@@ -47,7 +48,7 @@ int findDevices()
 
   return count;
 }
-
+*/
 /*
 
 /**
@@ -78,7 +79,7 @@ const int GPIO01TX = 1;
 const int GPIO03RX = 3;
 const int GPIO12Relay = 12;
 const int GPIO13Led = 13;
-const int GPIO14Pin = 15;
+const int GPIO14Pin = 14;
 
 int buttonState = HIGH;
 int buttonStateOld = HIGH;
@@ -259,8 +260,6 @@ void setup(void) {
   ArduinoOTA.begin();
   blink(GPIO13Led, 600, 3);
   
-  mqtton();
-
   Alarm.timerOnce(300, tewifi->checkWifi);        // called once after 5min
 
   /*
@@ -284,9 +283,9 @@ void setup(void) {
     http.end();
   }
 
-  configure->setVariable("1Wire",String(findDevices()));
-
-
+//  configure->setVariable("1Wire",String(findDevices()));
+//  if (configure->getVariable("MQTTenabled")=="on")  mqtton();
+ 
 }
 
 //unsigned long lastMillis = 0;
@@ -300,7 +299,8 @@ void loop(void) {
    dealwithgpio(GPIO03RX,GPIO12Relay);
    dealwithgpio(GPIO01TX,GPIO12Relay);
   }
-  mqttcheck();
+
+  if (configure->getVariable("MQTTenabled")=="on")  mqttcheck();
 
   ArduinoOTA.handle(); //  Handle OTA server.
   yield();

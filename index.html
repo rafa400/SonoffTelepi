@@ -40,12 +40,53 @@
        </div>
        <div class="content">
          <h2></h2>
-         <img class="pure-img" src="sonoff.svg">
+         <object id="svag" class="pure-img" type="image/svg+xml" data="sonoff.svg"></object>
        </div>
     </div>
 </div>
 
 <script src="js/ui.js"></script>
+<script>
+  var svg=document.getElementById("svag");
+  var svgDoc;
+  var verde_os="fill: #003e00";
+  var verde_br="fill: #00ff00";
+  var rojo_br="fill: #ff0000";
 
+
+  svg.addEventListener("load",function() {
+      svgDoc = svg.contentDocument;
+
+      window.setInterval(function() { 
+	var xhttp = new XMLHttpRequest();
+	xhttp.onreadystatechange = function() {
+           if (this.readyState == 4 && this.status == 200) {
+              var obj = JSON.parse(this.responseText);
+    	      var gpio13led=svgDoc.getElementById("path3804");
+    	      var gpio14=svgDoc.getElementById("path3808-5");
+    	      var gpio01=svgDoc.getElementById("path3808-6");
+    	      var gpio02=svgDoc.getElementById("path3808");
+    	      var gpio12Ra=svgDoc.getElementById("rect4012-9");
+    	      var gpio12Rb=svgDoc.getElementById("rect4010-0");
+                     
+	      if (obj.GPIO13=="ON") gpio13led.setAttribute("style", verde_br);
+                             else   gpio13led.setAttribute("style", verde_os);
+	      if (obj.GPIO14=="ON") gpio14.setAttribute("style", verde_br);
+                             else   gpio14.setAttribute("style", verde_os);
+	      if (obj.GPIO01=="ON") gpio01.setAttribute("style", verde_br);
+                             else   gpio01.setAttribute("style", verde_os);
+	      if (obj.GPIO02=="ON") gpio02.setAttribute("style", verde_br);
+                             else   gpio02.setAttribute("style", verde_os);
+	      if (obj.GPIO12=="ON") {gpio12Ra.setAttribute("style", rojo_br);gpio12Rb.setAttribute("style", rojo_br);}
+                             else   {gpio12Ra.setAttribute("style", verde_os);gpio12Rb.setAttribute("style", verde_os);}
+           }
+        };
+        xhttp.open("GET", "json", true);
+        xhttp.send();
+      }, 5000);
+
+  }, false);
+
+</script>
 </body>
 </html>
